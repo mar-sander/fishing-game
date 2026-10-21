@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b2635">
+<meta name="description" content="ひとつの矢印、ふたりの反射神経。1台のキーボードで遊ぶ釣り対戦ゲーム。">
+<title>FISHING DUEL — FA2 / RC3</title>
+<meta name="release-candidate" content="FD-S1-FA2-RC3">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+  <header class="masthead"><a class="brand" href="#" aria-label="FISHING DUEL タイトルへ">FD<span> / </span>FISHING DUEL</a><span class="edition">LOCAL TWO-PLAYER · FA2 / RC3</span><div class="utilities"><button id="sound" aria-pressed="false" aria-label="音をオンにする">SOUND OFF</button><button id="pause" disabled aria-label="一時停止">Ⅱ</button><button id="fullscreen" aria-label="全画面表示">⛶</button></div></header>
+  <section id="arena" class="arena" aria-label="FISHING DUEL ゲーム画面">
+    <svg id="lake" viewBox="0 0 1440 810" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="湖の左の水中で抵抗する魚と、右のボートで竿を引く人間">
+<defs>
+  <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#81b9c9"/><stop offset=".65" stop-color="#e4d9b8"/><stop offset="1" stop-color="#f6cc94"/></linearGradient>
+  <linearGradient id="water" x2=".25" y2="1"><stop stop-color="#319cac"/><stop offset=".3" stop-color="#146d83"/><stop offset="1" stop-color="#082b43"/></linearGradient>
+  <linearGradient id="body" x2="0" y2="1"><stop stop-color="#0b5267"/><stop offset=".48" stop-color="#66c2c9"/><stop offset=".75" stop-color="#b4e5d8"/><stop offset="1" stop-color="#539fba"/></linearGradient>
+  <linearGradient id="boatColor" x2="0" y2="1"><stop stop-color="#f6bb63"/><stop offset="1" stop-color="#be6345"/></linearGradient>
+  <linearGradient id="sunRay" x2="0" y2="1"><stop stop-color="#d9ffdd" stop-opacity=".16"/><stop offset="1" stop-color="#c5f6de" stop-opacity="0"/></linearGradient>
+  <radialGradient id="vignette"><stop offset=".4" stop-color="#061f30" stop-opacity="0"/><stop offset="1" stop-color="#061f30" stop-opacity=".35"/></radialGradient>
+  <pattern id="grain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="2" r=".6" fill="#fff" opacity=".06"/><circle cx="5" cy="5" r=".6" fill="#001c2f" opacity=".08"/></pattern>
+  <g id="pine"><path d="M0 0-17 43-8 39-26 68-13 64-34 96H34L13 64 26 68 8 39 17 43Z"/><path d="M-2 50H2V118H-2Z"/></g>
+  <g id="minifish"><path d="M-25 0Q-7-15 15-7L28-18 25 0 28 17 15 8Q-8 17-25 0Z"/></g>
+</defs>
+<rect width="1440" height="440" fill="url(#sky)"/>
+<circle cx="926" cy="259" r="83" fill="#fff1c4" opacity=".65"/>
+<path d="M0 337 115 275 190 294 365 170 431 215 485 200 649 321 761 257 850 320 1010 231 1111 299 1240 203 1440 299V460H0Z" fill="#729e9e"/>
+<path d="m247 264 118-94 66 45-39-13-23-19-42 47-22-5Z" fill="#c9d6bc" opacity=".5"/>
+<path d="M0 375 125 305 262 366 428 289 574 352 703 319 848 379 1044 301 1155 358 1331 282 1440 340V451H0Z" fill="#477c7e"/>
+
+<use href="#pine" transform="translate(-3.2 355.3) scale(0.51)" fill="#3a7271"/>
+<use href="#pine" transform="translate(14.5 301.2) scale(0.97)" fill="#306768"/>
+<use href="#pine" transform="translate(37.2 291.7) scale(1.05)" fill="#3a7271"/>
+<use href="#pine" transform="translate(54.8 330.2) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(89.7 309.9) scale(0.90)" fill="#3a7271"/>
+<use href="#pine" transform="translate(101.5 279.1) scale(1.16)" fill="#306768"/>
+<use href="#pine" transform="translate(128.4 314.4) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(138.1 357.4) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(175.0 277.4) scale(1.17)" fill="#3a7271"/>
+<use href="#pine" transform="translate(181.3 306.5) scale(0.93)" fill="#306768"/>
+<use href="#pine" transform="translate(201.4 351.5) scale(0.55)" fill="#3a7271"/>
+<use href="#pine" transform="translate(223.9 290.8) scale(1.06)" fill="#306768"/>
+<use href="#pine" transform="translate(261.0 295.6) scale(1.02)" fill="#3a7271"/>
+<use href="#pine" transform="translate(268.4 353.7) scale(0.53)" fill="#306768"/>
+<use href="#pine" transform="translate(298.0 324.5) scale(0.78)" fill="#3a7271"/>
+<use href="#pine" transform="translate(323.6 274.8) scale(1.20)" fill="#306768"/>
+<use href="#pine" transform="translate(328.4 346.5) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(365.9 342.3) scale(0.62)" fill="#306768"/>
+<use href="#pine" transform="translate(386.0 291.0) scale(1.06)" fill="#3a7271"/>
+<use href="#pine" transform="translate(403.5 349.0) scale(0.57)" fill="#306768"/>
+<use href="#pine" transform="translate(416.0 309.3) scale(0.90)" fill="#3a7271"/>
+<use href="#pine" transform="translate(435.1 272.6) scale(1.22)" fill="#306768"/>
+<use href="#pine" transform="translate(455.3 276.3) scale(1.18)" fill="#3a7271"/>
+<use href="#pine" transform="translate(479.2 277.2) scale(1.18)" fill="#306768"/>
+<use href="#pine" transform="translate(505.0 355.0) scale(0.52)" fill="#3a7271"/>
+<use href="#pine" transform="translate(522.6 272.7) scale(1.21)" fill="#306768"/>
+<use href="#pine" transform="translate(544.1 362.0) scale(0.46)" fill="#3a7271"/>
+<use href="#pine" transform="translate(572.1 346.4) scale(0.59)" fill="#306768"/>
+<use href="#pine" transform="translate(592.4 342.1) scale(0.63)" fill="#3a7271"/>
+<use href="#pine" transform="translate(604.1 300.7) scale(0.98)" fill="#306768"/>
+<use href="#pine" transform="translate(632.1 357.0) scale(0.50)" fill="#3a7271"/>
+<use href="#pine" transform="translate(655.1 328.8) scale(0.74)" fill="#306768"/>
+<use href="#pine" transform="translate(670.1 281.2) scale(1.14)" fill="#3a7271"/>
+<use href="#pine" transform="translate(689.7 329.8) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(707.3 343.1) scale(0.62)" fill="#3a7271"/>
+<use href="#pine" transform="translate(735.1 362.3) scale(0.45)" fill="#306768"/>
+<use href="#pine" transform="translate(754.1 317.7) scale(0.83)" fill="#3a7271"/>
+<use href="#pine" transform="translate(770.3 336.4) scale(0.67)" fill="#306768"/>
+<use href="#pine" transform="translate(795.2 315.1) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(818.1 329.3) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(846.2 365.6) scale(0.43)" fill="#3a7271"/>
+<use href="#pine" transform="translate(857.3 335.2) scale(0.68)" fill="#306768"/>
+<use href="#pine" transform="translate(889.2 285.6) scale(1.11)" fill="#3a7271"/>
+<use href="#pine" transform="translate(902.6 276.5) scale(1.18)" fill="#306768"/>
+<use href="#pine" transform="translate(916.0 295.8) scale(1.02)" fill="#3a7271"/>
+<use href="#pine" transform="translate(940.5 271.6) scale(1.22)" fill="#306768"/>
+<use href="#pine" transform="translate(957.9 304.4) scale(0.95)" fill="#3a7271"/>
+<use href="#pine" transform="translate(985.6 302.8) scale(0.96)" fill="#306768"/>
+<use href="#pine" transform="translate(1003.2 280.2) scale(1.15)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1036.8 324.6) scale(0.77)" fill="#306768"/>
+<use href="#pine" transform="translate(1042.3 274.6) scale(1.20)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1072.4 358.3) scale(0.49)" fill="#306768"/>
+<use href="#pine" transform="translate(1084.3 346.5) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1119.9 361.4) scale(0.46)" fill="#306768"/>
+<use href="#pine" transform="translate(1128.8 314.1) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1161.8 303.2) scale(0.96)" fill="#306768"/>
+<use href="#pine" transform="translate(1167.4 317.1) scale(0.84)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1192.4 321.7) scale(0.80)" fill="#306768"/>
+<use href="#pine" transform="translate(1215.8 330.0) scale(0.73)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1232.8 356.8) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(1262.1 355.7) scale(0.51)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1285.4 356.6) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(1305.7 308.9) scale(0.91)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1315.2 271.2) scale(1.23)" fill="#306768"/>
+<use href="#pine" transform="translate(1343.5 346.0) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1362.4 362.9) scale(0.45)" fill="#306768"/>
+<use href="#pine" transform="translate(1380.4 332.9) scale(0.70)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1400.7 318.1) scale(0.83)" fill="#306768"/>
+<use href="#pine" transform="translate(1426.0 334.8) scale(0.69)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1443.4 308.8) scale(0.91)" fill="#306768"/>
+<use href="#pine" transform="translate(1478.3 277.2) scale(1.18)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1494.6 278.7) scale(1.16)" fill="#306768"/>
+<use href="#pine" transform="translate(1512.8 271.1) scale(1.23)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1525.7 352.3) scale(0.54)" fill="#306768"/>
+<path d="M0 416Q210 390 401 414T789 416T1111 412T1440 414V445H0Z" fill="#244f56"/>
+<use href="#pine" transform="translate(12 228) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(74 205) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(160 248) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1325 215) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1390 237) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1450 244) scale(1.8)" fill="#214e55"/>
+<rect y="417" width="1440" height="393" fill="url(#water)"/>
+<path d="M361 419 95 810H280L407 419ZM760 419 612 810H896L805 419ZM1088 419 1169 810H1385L1134 419Z" fill="url(#sunRay)"/>
+<g fill="none" stroke="#a1e5d8" stroke-width="2" opacity=".22">
+<path d="M1009 442q50.0 -5 100 0"/>
+<path d="M713 473q48.0 -5 96 0"/>
+<path d="M1302 477q53.0 -5 106 0"/>
+<path d="M460 474q27.0 -5 54 0"/>
+<path d="M1353 455q43.5 -5 87 0"/>
+<path d="M1163 480q46.5 -5 93 0"/>
+<path d="M977 462q17.0 -5 34 0"/>
+<path d="M182 435q44.0 -5 88 0"/>
+<path d="M582 493q11.0 -5 22 0"/>
+<path d="M1033 461q15.5 -5 31 0"/>
+<path d="M528 488q12.5 -5 25 0"/>
+<path d="M301 458q21.5 -5 43 0"/>
+<path d="M814 461q31.0 -5 62 0"/>
+<path d="M1393 445q58.0 -5 116 0"/>
+<path d="M249 433q34.5 -5 69 0"/>
+<path d="M225 465q39.0 -5 78 0"/>
+<path d="M1080 447q25.5 -5 51 0"/>
+<path d="M902 492q56.5 -5 113 0"/>
+<path d="M1110 461q39.5 -5 79 0"/>
+<path d="M620 470q38.0 -5 76 0"/>
+<path d="M346 447q31.0 -5 62 0"/>
+<path d="M862 466q40.0 -5 80 0"/>
+<path d="M797 488q49.0 -5 98 0"/>
+<path d="M366 432q55.5 -5 111 0"/>
+<path d="M1124 467q29.5 -5 59 0"/>
+<path d="M636 446q25.0 -5 50 0"/>
+<path d="M75 475q37.5 -5 75 0"/>
+<path d="M250 439q26.0 -5 52 0"/>
+</g>
+<use href="#minifish" transform="translate(600 610) scale(0.9)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(890 691) scale(0.7)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(1055 564) scale(0.7)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(1260 655) scale(1.1)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(720 755) scale(0.5)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(110 485) scale(0.4)" fill="#073a50" opacity=".55"/>
+<circle cx="275" cy="595" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="1189" cy="670" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="882" cy="759" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1432" cy="531" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1" cy="558" r="1.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="41" cy="719" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="632" cy="686" r="2.4" fill="#abd6c7" opacity=".14"/>
+<circle cx="1016" cy="594" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="294" cy="604" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="464" cy="711" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="715" cy="566" r="1.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="1377" cy="659" r="3.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="1129" cy="538" r="2.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="195" cy="667" r="1.5" fill="#abd6c7" opacity=".14"/>
+<circle cx="2" cy="703" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="1050" cy="547" r="2.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="1159" cy="658" r="1.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="1028" cy="710" r="2.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="387" cy="768" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="37" cy="668" r="2.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="258" cy="720" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1179" cy="505" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="348" cy="497" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="533" cy="510" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="880" cy="609" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="464" cy="576" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="414" cy="633" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="1012" cy="710" r="2.4" fill="#abd6c7" opacity=".14"/>
+<circle cx="1151" cy="589" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="878" cy="673" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="401" cy="580" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="142" cy="585" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="997" cy="765" r="2.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="862" cy="704" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="385" cy="645" r="2.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="337" cy="542" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="429" cy="692" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="639" cy="501" r="2.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="72" cy="686" r="1.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="17" cy="540" r="1.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="355" cy="721" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="738" cy="744" r="1.9" fill="#abd6c7" opacity=".14"/>
+<path d="M0 754Q100 725 198 768T439 756T691 776T922 751T1190 771T1440 747V810H0Z" fill="#12394a"/>
+<path d="M0 794Q110 754 264 795T563 799T866 786T1161 801T1440 777V810H0Z" fill="#0b2b3d"/>
+
+<path d="M829 815q-24 -51 -5 -128q28 45 5 128" fill="#0b3b50"/>
+<path d="M418 815q-24 -13 -5 -32q28 11 5 32" fill="#12485a"/>
+<path d="M90 815q-24 -14 -5 -36q28 13 5 36" fill="#12485a"/>
+<path d="M305 815q-24 -22 -5 -56q28 20 5 56" fill="#10384b"/>
+<path d="M787 815q-24 -14 -5 -36q28 13 5 36" fill="#0b3b50"/>
+<path d="M915 815q-24 -41 -5 -102q28 36 5 102" fill="#10384b"/>
+<path d="M378 815q-24 -44 -5 -110q28 38 5 110" fill="#0b3b50"/>
+<path d="M1344 815q-24 -16 -5 -40q28 14 5 40" fill="#12485a"/>
+<path d="M474 815q-24 -42 -5 -106q28 37 5 106" fill="#10384b"/>
+<path d="M1442 815q-24 -39 -5 -98q28 34 5 98" fill="#0b3b50"/>
+<path d="M653 815q-24 -44 -5 -109q28 38 5 109" fill="#0b3b50"/>
+<path d="M281 815q-24 -26 -5 -65q28 23 5 65" fill="#10384b"/>
+<path d="M142 815q-24 -13 -5 -33q28 12 5 33" fill="#12485a"/>
+<path d="M719 815q-24 -40 -5 -99q28 35 5 99" fill="#0b3b50"/>
+<path d="M1265 815q-24 -17 -5 -43q28 15 5 43" fill="#10384b"/>
+<path d="M110 815q-24 -44 -5 -109q28 38 5 109" fill="#12485a"/>
+<path d="M556 815q-24 -34 -5 -84q28 29 5 84" fill="#10384b"/>
+<path d="M263 815q-24 -21 -5 -52q28 18 5 52" fill="#0b3b50"/>
+<path d="M213 815q-24 -20 -5 -50q28 18 5 50" fill="#12485a"/>
+<path d="M1126 815q-24 -12 -5 -29q28 10 5 29" fill="#0b3b50"/>
+<path d="M1156 815q-24 -14 -5 -35q28 12 5 35" fill="#0b3b50"/>
+<path d="M465 815q-24 -54 -5 -134q28 47 5 134" fill="#12485a"/>
+<path d="M907 815q-24 -32 -5 -81q28 28 5 81" fill="#12485a"/>
+<path d="M1167 815q-24 -12 -5 -31q28 11 5 31" fill="#12485a"/>
+<path d="M911 815q-24 -20 -5 -49q28 17 5 49" fill="#12485a"/>
+<path d="M181 815q-24 -19 -5 -48q28 17 5 48" fill="#12485a"/>
+<path d="M176 815q-24 -20 -5 -51q28 18 5 51" fill="#12485a"/>
+<path d="M530 815q-24 -30 -5 -74q28 26 5 74" fill="#12485a"/>
+<path d="M924 815q-24 -29 -5 -73q28 26 5 73" fill="#10384b"/>
+<path d="M632 815q-24 -20 -5 -50q28 18 5 50" fill="#12485a"/>
+<path d="M491 815q-24 -37 -5 -92q28 32 5 92" fill="#10384b"/>
+<path d="M9 815q-24 -28 -5 -69q28 24 5 69" fill="#12485a"/>
+<path d="M1157 815q-24 -13 -5 -33q28 12 5 33" fill="#0b3b50"/>
+<path d="M1216 815q-24 -38 -5 -95q28 33 5 95" fill="#10384b"/>
+<path d="M71 815q-24 -51 -5 -128q28 45 5 128" fill="#12485a"/>
+<path d="M197 815q-24 -32 -5 -81q28 28 5 81" fill="#0b3b50"/>
+<!-- 紐の端点・魚・人間・ボートはJSで独立して動かします。 -->
+<g id="fish-wake" fill="none" stroke="#9adecf" stroke-width="2" stroke-linecap="round" stroke-dasharray="28 22" opacity="0"><path d="M115-32Q152-47 190-40M132 0H218M118 31Q153 45 190 43"/></g>
+<g id="boat-wake" fill="none" stroke="#d2e8ce" stroke-width="2.5" stroke-linecap="round" opacity=".4"><path d="M1070 431q40 15 81 3M1092 442q43 10 76 2M1365 455q36 8 73-2"/></g>
+<g id="boat" transform="translate(0 0)">
+  <ellipse cx="1252" cy="434" rx="178" ry="17" fill="#063e55" opacity=".55"/>
+  <path d="M1068 388 1448 398 1390 447Q1181 455 1117 430Z" fill="url(#boatColor)" stroke="#874e40" stroke-width="3"/>
+  <path d="M1068 388 1448 398 1444 409 1082 400Z" fill="#ffdb8d"/>
+  <path d="m1116 421 282 12" stroke="#9d5140" stroke-width="3" opacity=".6"/>
+  <g id="stance">
+  <path d="M1170 392 1191 352 1245 344 1284 397" fill="#243d4c" stroke="#162f3f" stroke-width="5"/>
+  <path d="m1202 351 67 26 34 22h-60l-56-27" fill="#243d4c" stroke="#162f3f" stroke-width="5"/>
+  </g>
+  <g id="angler" transform="rotate(0 1242 340)">
+    <path d="M1230 268Q1260 265 1276 299L1287 351 1234 365 1207 304Z" fill="#dc7756" stroke="#633e39" stroke-width="3"/>
+    <path d="m1242 274-11 78 32-2 7-63" fill="#253c41"/>
+    <path d="m1221 286-39 19-22-40-17 10 26 59q7 6 17 0l43-20" fill="#e28a61" stroke="#633e39" stroke-width="3"/>
+    <path d="m1264 295-46 13-56-44-10 13 58 58q8 5 17 1l48-17" fill="#ed9a72" stroke="#633e39" stroke-width="3"/>
+    <path d="m1244 252-1 24 18 1 1-30" fill="#dba47b"/>
+    <path d="M1225 223Q1222 253 1240 263L1260 258 1270 231Z" fill="#f2c69c"/>
+    <path d="m1262 229-4 26 14-20" fill="#483f3a"/>
+    <path d="M1214 224q-9-7 3-11l10-31q14-12 37 0l11 30q31 14 0 19Z" fill="#bd8b54" stroke="#654d38" stroke-width="3"/>
+    <path d="m1221 204 47 5 6 12-57-8" fill="#604f3b"/>
+    <path d="M1214 224q30-8 61 7" fill="none" stroke="#f4ca8b" stroke-width="3"/>
+  </g>
+</g>
+<path id="rod" d="M1161 275Q1073 119 948 160" fill="none" stroke="#382f30" stroke-width="9" stroke-linecap="round"/>
+<path id="rod-shine" d="M1161 275Q1073 119 948 160" fill="none" stroke="#cd8c59" stroke-width="3" stroke-linecap="round"/>
+<g id="fishing-line"><path id="line-shadow" d="M948 160 181 538" fill="none" stroke="#064156" stroke-width="5" opacity=".16"/><path id="line" d="M948 160 181 538" fill="none" stroke="#edf6d7" stroke-width="2"/><path id="line-flash" d="M948 160 181 538" fill="none" stroke="#fff9bd" stroke-width="6" opacity="0"/></g>
+<g id="fish" transform="translate(285 582) rotate(24)">
+  <g id="fish-flex">
+  <g id="fish-tail"><path d="M72-11 125-58 115-6 131 45 74 16" fill="#428c9e" stroke="#153f54" stroke-width="4"/><path d="m88 1 26-30M88 5l29 24" stroke="#89c8c8" stroke-width="2" fill="none"/></g>
+  <path d="M-35-36-12-75 11-47 27-69 48-37" fill="#31788e" stroke="#153f54" stroke-width="4"/>
+  <path d="M-111 2Q-87-59-24-49 50-49 88-1 49 55-27 48-88 43-111 2Z" fill="url(#body)" stroke="#153f54" stroke-width="4"/>
+  <path d="M-99 18Q-28 51 60 17-5 67-69 33" fill="#d4ede0" opacity=".65"/>
+  <path d="M-37-39Q-12-6-37 38" stroke="#22687c" stroke-width="3" fill="none"/>
+  <path d="M-12 18 30 58 48 30" fill="#4b96ab" stroke="#20516b" stroke-width="3"/>
+  <path d="m26-25 12 8m8-5 12 8m-29 4 12 8m10-7 12 8m-23 1 12 8" stroke="#c8eece" opacity=".3" stroke-width="3"/>
+  <ellipse cx="-71" cy="-11" rx="14" ry="18" fill="#e4f2da"/>
+  <ellipse cx="-77" cy="-9" rx="7" ry="10" fill="#102b3e"/>
+  <circle cx="-79" cy="-13" r="3" fill="#fff"/>
+  <path d="m-96-4-15 6 12 9" fill="#143e52" stroke="#153f54" stroke-width="3"/>
+  <path d="M-115-3q-6 18 10 12" fill="none" stroke="#e6dec1" stroke-width="3"/>
+  <path d="m-114 0-12-1" stroke="#c99469" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</g>
+<g id="bait" transform="translate(159 581)" opacity="0"><path d="M0 0q-10-9-15 0t-14 2" fill="none" stroke="#e8a26d" stroke-width="6" stroke-linecap="round"/></g>
+<g id="spray" fill="#d6f1df" opacity=".7"></g>
+<g id="bubbles" fill="none" stroke="#b7e5d9" stroke-width="1.5" opacity=".5"></g>
+<!-- キャラクターに追従する判定専用漫符。入力や時間判定とは独立。 -->
+<g id="fish-signal" opacity="0" pointer-events="none" aria-hidden="true">
+  <g id="fish-great-mark" fill="#b8f5db" stroke="#123e50" stroke-width="3" stroke-linejoin="round"><path d="M-7-23H7L5 8H-5Z"/><circle cy="18" r="5"/></g>
+  <g id="fish-bad-mark" fill="none" stroke="#173c4d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12" stroke="#e8ead2" stroke-width="6"/><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12"/></g>
+</g>
+<g id="human-signal" opacity="0" pointer-events="none" aria-hidden="true">
+  <g id="human-great-mark" fill="#ffe0a0" stroke="#4d3d33" stroke-width="3" stroke-linejoin="round"><path d="M-7-23H7L5 8H-5Z"/><circle cy="18" r="5"/></g>
+  <g id="human-bad-mark" fill="none" stroke="#513f38" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12" stroke="#eee4ca" stroke-width="6"/><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12"/></g>
+</g>
+<path id="surface" d="M0 419Q80 413 160 419T480 419T800 419T1120 419T1440 419" stroke="#c6e9d5" stroke-width="3" fill="none" opacity=".65"/>
+<rect width="1440" height="810" fill="url(#grain)" pointer-events="none"/>
+<rect width="1440" height="810" fill="url(#vignette)" pointer-events="none"/>
+</svg>
+    <div class="hud">
+      <section class="health fish-health" aria-label="魚の体力"><div class="health-label"><span><b>02</b> FISH</span><output id="fish-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="魚の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="fish-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>逃げ切れ。</span><span>W A S D</span></div></section>
+      <section class="clock" aria-label="残り時間"><span>TIME LEFT</span><output id="timer">60<span>.0</span></output><small id="round-counter">00 / 20</small></section>
+      <section class="health human-health" aria-label="人間の体力"><div class="health-label"><span><b>01</b> HUMAN</span><output id="human-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="人間の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="human-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>釣り上げろ。</span><span>↑ ← ↓ →</span></div></section>
+    </div>
+    <div id="cue" class="cue dormant" aria-label="共通方向指示">
+      <div class="judgment fish-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">02 / FISH</span><strong id="fish-judge">READY</strong><small id="fish-detail">WASD</small></div>
+      <div class="prompt"><svg class="prompt-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="55"/><circle id="deadline-ring" cx="60" cy="60" r="55" pathLength="100"/></svg><svg id="direction" viewBox="0 0 100 100" aria-hidden="true" hidden><path id="direction-arrow" d="M50 9 85 44H66V87H34V44H15Z"/></svg><svg id="prompt-idle" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9V31M9 20H31"/><circle cx="20" cy="20" r="17"/></svg><span id="direction-name" class="sr-only">待機中</span><span id="prompt-label">STAND BY</span></div>
+      <div class="judgment human-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">01 / HUMAN</span><strong id="human-judge">READY</strong><small id="human-detail">矢印キー</small></div>
+    </div>
+    <div id="round-feedback" class="round-feedback" aria-live="off"></div>
+    <div class="arena-caption"><span>ONE LAKE. TWO WILLS.</span><span id="phase">THE LINE IS DRAWN.</span></div>
+    <div id="countdown" class="countdown" hidden><span>THE DUEL BEGINS</span><strong id="count-number">3</strong><small>左の魚はWASD ／ 右の人間は矢印キー</small></div>
+    <div id="intro" class="overlay intro">
+      <div class="intro-card"><span class="eyebrow">A GAME OF REFLEX & RESOLVE</span><h1>FISHING<br><em>DUEL.</em></h1><p class="tagline">ひとつの矢印。ふたつの意地。</p><p class="intro-copy">釣り上げたい人間と、逃げ切りたい魚。<br>同じ方向指示に、ふたり同時に応えよう。</p>
+        <div class="players"><div><span class="player-tag fish-color">02 / FISH</span><div class="key-pad"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div></div><span class="versus">VS</span><div><span class="player-tag human-color">01 / HUMAN</span><div class="key-pad"><kbd>↑</kbd><span><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></span></div></div></div>
+        <button id="start" class="primary">対戦をはじめる <span>↗</span></button><div class="start-foot"><span>60 SECONDS / 20 SIGNALS</span><button id="help-open">遊び方 ↗</button></div><p class="keyboard-note">PC・キーボード1台・プレイヤー2人</p>
+      </div>
+    </div>
+    <div id="paused" class="overlay pause-overlay" hidden><div class="pause-card"><span class="eyebrow">TAKE A BREATH</span><h2>PAUSED.</h2><p id="pause-message">ふたりの準備ができたら再開してください。</p><button id="resume" class="primary">対戦を再開 <span>↗</span></button><button id="quit" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="result" class="overlay result-overlay" hidden><div class="result-card"><span id="result-reason" class="eyebrow">TIME UP</span><h2 id="result-title">DRAW</h2><p id="result-copy"></p><div class="result-score"><div class="fish-color"><span>02 / FISH</span><strong id="result-fish">100</strong></div><span class="score-colon">:</span><div class="human-color"><span>01 / HUMAN</span><strong id="result-human">100</strong></div></div><div id="stats" class="stats"></div><button id="rematch" class="primary">もう一度、勝負する <span>↗</span></button><button id="back" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="help" class="overlay help-overlay" hidden><div class="help-card" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="help-heading"><span class="eyebrow">FIELD GUIDE / 01</span><button id="help-close" aria-label="遊び方を閉じる">✕</button></div><h2 id="help-title">反射神経で、<br>この糸の運命を決める。</h2><p>中央に出た矢印と同じ方向を入力。<br>左の魚は <b>W A S D</b>、右の人間は <b>矢印キー</b>。受付は1秒です。</p><div class="rules-table"><div><strong class="great">GREAT</strong><span>0.5秒以内に正解</span><b>相手 −7.5</b></div><div><strong class="good">GOOD</strong><span>0.5秒超〜1秒以内に正解</span><b>相手 −5</b></div><div><strong class="bad">BAD</strong><span>誤った方向を入力</span><b>自分 −2.5</b></div><div><strong>未入力</strong><span>1秒以内に入力なし</span><b>変化なし</b></div></div><p class="help-note">各指示で入力はひとり1回。押しっぱなし・連打は無効です。<br>双方のダメージを同時に反映し、体力0で決着。60秒経ったら残り体力で勝負します。両者同時に0なら DOUBLE K.O.、時間切れで同値なら DRAW です。</p><button id="help-done" class="primary">準備できました <span>↗</span></button></div></div>
+  </section>
+  <footer class="footer"><span><i></i> LOCAL DUEL <span class="footer-divider">/</span> AI-ASSISTED GAME CREATION</span><span class="footer-controls">ESC 一時停止 <span class="footer-divider">·</span> ヘッドホン推奨</span><button id="guide">RULES ↗</button></footer>
+</main>
+<p id="mobile-note" class="mobile-note">このゲームはPCのキーボードで2人対戦します。画面の閲覧はこの端末でも可能です。</p>
+<div id="announcer" class="sr-only" aria-live="polite"></div>
+<script src="engine.js"></script>
+<script src="scene.js"></script>
+<script src="audio.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

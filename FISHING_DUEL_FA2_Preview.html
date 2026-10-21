@@ -1,0 +1,1574 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b2635">
+<meta name="description" content="ひとつの矢印、ふたりの反射神経。1台のキーボードで遊ぶ釣り対戦ゲーム。">
+<title>FISHING DUEL — FA2 / RC3</title>
+<meta name="release-candidate" content="FD-S1-FA2-RC3">
+<style>
+:root {
+  color-scheme: dark;
+  --ink: #0b2635;
+  --paper: #f3eedb;
+  --muted: #a7bfc2;
+  --fish: #8be6da;
+  --human: #ffd495;
+  --bad: #ffa490;
+  font-family: Arial, 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #081c29; color: var(--paper); }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .35; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--human); outline-offset: 5px; }
+button { color: inherit; }
+[hidden] { display: none !important; }
+.shell { width: min(1640px, calc(100% - 72px)); margin: 0 auto; }
+.masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 84px; }
+.brand { color: var(--paper); text-decoration: none; font-weight: 900; font-size: 15px; letter-spacing: .02em; }
+.brand span { color: #6f8e95; margin: 0 12px; font-weight: 400; }
+.edition { font-size: 10px; letter-spacing: .2em; color: var(--muted); }
+.utilities { display: flex; gap: 8px; }
+.utilities button { border: 1px solid #34505b; background: none; border-radius: 4px; min-width: 36px; height: 34px; font-size: 18px; }
+.utilities #sound { font-size: 10px; letter-spacing: .1em; padding: 0 12px; }
+.utilities button:hover:not(:disabled) { background: #193644; }
+.arena { position: relative; isolation: isolate; overflow: hidden; aspect-ratio: 16/9; container-type: inline-size; background: #12627b; border-radius: 10px; border: 1px solid #385561; box-shadow: 0 26px 80px #0004; }
+#lake { width: 100%; height: 100%; display: block; }
+.hud { position: absolute; inset: 4.3% 4% auto; display: grid; grid-template-columns: 1fr 20% 1fr; align-items: start; gap: 3%; text-shadow: 0 2px 8px #163f4d55; }
+.health { min-width: 0; }
+.health-label { display: flex; justify-content: space-between; align-items: end; gap: 12px; font-size: clamp(12px, 1.9cqw, 28px); font-weight: 900; letter-spacing: -.025em; }
+.health-label b { font-size: .46em; letter-spacing: .08em; padding: .25em .42em; border: 1px solid currentColor; border-radius: 2px; vertical-align: .3em; margin-right: .4em; }
+.health-label output { font-variant-numeric: tabular-nums; font-size: .8em; }
+.health-label output span { font-size: .55em; opacity: .65; margin-left: .3em; letter-spacing: .04em; }
+.fish-health { color: #073347; }
+.human-health { color: #073347; }
+.health-track { margin-top: .6cqw; height: 1.35cqw; min-height: 8px; background: #0a3149c9; border: 2px solid #eff1d9; border-radius: 3px; position: relative; overflow: hidden; box-shadow: 0 2px 0 #12405155; }
+.health-fill, .health-loss { width: 100%; position: absolute; inset: 0 auto 0 0; transition: width .24s ease-out; }
+.health-loss { background: #f8f3dc; transition: width .7s .2s; }
+.fish-health .health-fill { background: var(--fish); }
+.human-health .health-fill { background: var(--human); }
+.health-foot { display: flex; justify-content: space-between; font-size: clamp(8px, .78cqw, 12px); margin-top: .55cqw; font-weight: 700; letter-spacing: .08em; opacity: .85; }
+.clock { text-align: center; color: #123347; margin-top: -.4cqw; }
+.clock > span { display: block; font-size: clamp(8px, .68cqw, 12px); letter-spacing: .18em; font-weight: 700; }
+.clock output { display: block; font-size: clamp(24px, 4.4cqw, 70px); line-height: 1.1; letter-spacing: -.06em; font-weight: 900; font-variant-numeric: tabular-nums; }
+.clock output span { font-size: .4em; opacity: .65; letter-spacing: -.03em; }
+.clock small { display: block; font-size: clamp(8px, .7cqw, 12px); font-variant-numeric: tabular-nums; letter-spacing: .12em; margin-top: .2cqw; }
+.clock.urgent { color: #a53f35; }
+.cue { position: absolute; top: 25.3%; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 1.5cqw; pointer-events: none; }
+.prompt { width: 10.5cqw; height: 10.5cqw; border-radius: 50%; background: #0a2a3bef; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 0 .45cqw #e5f0d42b, 0 8px 30px #092b4330; position: relative; }
+.prompt-ring { position: absolute; width: 106%; height: 106%; transform: rotate(-90deg); fill: none; stroke-width: 2.5; }
+.ring-track { stroke: #d6e5ca33; }
+#deadline-ring { stroke: #f4f1cf; stroke-dasharray: 100; stroke-dashoffset: 0; }
+#direction { font-family: Arial, sans-serif; font-size: 7.2cqw; line-height: 1; font-weight: 900; color: var(--paper); padding-bottom: .7cqw; }
+#prompt-label { position: absolute; bottom: 1.3cqw; font-size: .55cqw; font-weight: 700; letter-spacing: .12em; color: #cbdfd4; }
+.cue.dormant .prompt { opacity: .8; }
+.cue.dormant #direction { font-size: 3.5cqw; font-weight: 300; color: #c9ddd699; }
+.cue.dormant #deadline-ring { opacity: 0; }
+.cue.active .prompt { animation: cue-in .16s ease-out; }
+.cue.active .ring-track { stroke: #f2f4c944; }
+.judgment { width: 12cqw; min-height: 6.2cqw; display: flex; flex-direction: column; justify-content: center; }
+.fish-judgment { text-align: right; }
+.human-judgment { text-align: left; }
+.judge-owner { font-size: .58cqw; letter-spacing: .13em; color: #092f44; font-weight: 700; }
+.judgment strong { font-size: 2.5cqw; line-height: 1.15; font-weight: 900; letter-spacing: -.04em; color: #143b4b99; }
+.judgment small { font-size: .68cqw; letter-spacing: .025em; color: #204d58; margin-top: .2cqw; min-height: 1em; }
+.judgment.has-result strong { color: #f5f1d9; text-shadow: 0 2px 0 #164052, 0 0 18px #07374a77; animation: judge-in .18s ease-out; }
+.judgment.has-result.bad strong { color: #9a3a32; text-shadow: 0 1px 0 #fed3ac55; }
+.judgment.has-result.miss strong { color: #214d59; font-size: 1.8cqw; text-shadow: none; }
+.round-feedback { position: absolute; left: 50%; top: 48%; transform: translateX(-50%); text-align: center; font-size: .85cqw; font-weight: 700; letter-spacing: .04em; color: #e7f1d9; text-shadow: 0 2px 7px #064259; pointer-events: none; }
+.arena-caption { position: absolute; inset: auto 3% 3%; display: flex; justify-content: space-between; font-size: .65cqw; letter-spacing: .16em; color: #a0c7c7; pointer-events: none; }
+.overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 5; background: #0825373d; backdrop-filter: blur(5px); }
+.intro { background: linear-gradient(90deg, #092c4225 0%, #092939c9 39%, #092939e6 61%, #092c4225 100%); backdrop-filter: none; }
+.intro-card { width: 32cqw; text-align: center; padding: 2cqw 0; }
+.eyebrow { font-size: clamp(9px, .7cqw, 12px); font-weight: 700; letter-spacing: .16em; color: var(--fish); }
+h1 { margin: 1.1cqw 0 1cqw; font-family: 'Arial Black', Arial, sans-serif; font-size: 6.3cqw; line-height: .84; letter-spacing: -.065em; font-weight: 900; }
+h1 em { font-style: normal; color: var(--human); }
+.tagline { font-size: clamp(13px, 1.2cqw, 20px); font-weight: 700; letter-spacing: .13em; margin: 1.5cqw 0 1cqw; }
+.intro-copy { font-size: clamp(11px, .84cqw, 15px); line-height: 1.9; color: #c4d7d1; margin: .7cqw 0 1.35cqw; }
+.players { display: flex; justify-content: center; gap: 2.3cqw; align-items: center; margin-bottom: 1.4cqw; }
+.player-tag { font-size: clamp(10px, .7cqw, 12px); font-weight: 700; letter-spacing: .08em; }
+.human-color { color: var(--human); }
+.fish-color { color: var(--fish); }
+.key-pad { display: flex; flex-direction: column; align-items: center; gap: .2cqw; margin-top: .55cqw; }
+.key-pad span { display: flex; gap: .2cqw; }
+kbd { display: flex; align-items: center; justify-content: center; width: 1.8cqw; height: 1.7cqw; border: 1px solid #8ca9ae88; border-bottom-width: 3px; border-radius: 3px; color: var(--paper); font: 700 .85cqw Arial, sans-serif; background: #b7d3cc0c; }
+.versus { font-size: .75cqw; font-weight: 700; color: #819ca2; }
+.primary { width: 100%; border: none; border-radius: 4px; padding: 1.1cqw 1.4cqw; display: flex; align-items: center; justify-content: space-between; background: var(--paper); color: #123241; font-size: clamp(12px, .9cqw, 16px); font-weight: 700; transition: background .15s, transform .15s; }
+.primary:hover { background: var(--human); transform: translateY(-2px); }
+.primary span { font: 400 1.6em Arial, sans-serif; line-height: .7; }
+.start-foot { display: flex; justify-content: space-between; align-items: center; margin-top: .85cqw; }
+.start-foot > span { font-size: .52cqw; letter-spacing: .07em; color: #9bb7b8; }
+.start-foot button { font-size: .74cqw; border: none; background: none; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.keyboard-note { margin: .7cqw 0 0; font-size: clamp(9px, .64cqw, 11px); color: #9bb7b8; }
+.countdown { position: absolute; inset: 0; z-index: 4; background: #082b3a55; display: flex; align-items: center; justify-content: center; flex-direction: column; text-shadow: 0 2px 20px #0a2637; }
+.countdown > span { font-size: 1cqw; letter-spacing: .22em; }
+.countdown strong { font-size: 11cqw; font-weight: 900; line-height: 1.2; }
+.countdown small { font-size: 1cqw; letter-spacing: .04em; }
+.pause-card, .result-card { width: 36cqw; text-align: center; padding: 2cqw 0; }
+h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
+.pause-card p, .result-card p { font-size: 1cqw; line-height: 1.8; color: #c8d8d2; margin: 1.2cqw 0 2cqw; }
+.text-button { background: none; border: none; color: #a9c2c2; margin-top: 1.4cqw; padding: .3cqw; font-size: .8cqw; text-decoration: underline; text-underline-offset: 4px; }
+.result-score { display: flex; align-items: center; justify-content: center; gap: 3cqw; margin: 1.5cqw 0; }
+.result-score div { display: flex; flex-direction: column; }
+.result-score span { font-size: .7cqw; letter-spacing: .1em; }
+.result-score strong { font-size: 4cqw; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.result-score .score-colon { color: #86a5a9; font-size: 2cqw; }
+.result-card h2 { font-size: 4.4cqw; white-space: nowrap; }
+.stats { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: .3cqw; font-size: .75cqw; color: #b2cbc8; margin-bottom: 2cqw; font-variant-numeric: tabular-nums; }
+.stats b { font-size: .65cqw; letter-spacing: .08em; }
+.help-card { width: 44cqw; background: #102e3b; padding: 2.5cqw; border: 1px solid #4b6970; border-radius: 6px; box-shadow: 0 15px 70px #0005; }
+.help-heading { display: flex; justify-content: space-between; align-items: center; }
+.help-heading button { background: none; border: 0; font-size: 1.3cqw; }
+.help-card h2 { font-size: 2.5cqw; line-height: 1.35; letter-spacing: .01em; margin-top: 1.3cqw; }
+.help-card p { font-size: clamp(12px, .9cqw, 16px); line-height: 1.9; color: #c5d7d1; }
+.rules-table { border-top: 1px solid #547078; margin: 1.2cqw 0; }
+.rules-table > div { display: grid; grid-template-columns: 1fr 1.9fr .85fr; gap: .7cqw; align-items: center; padding: .75cqw 0; font-size: .8cqw; border-bottom: 1px solid #45616b; }
+.rules-table strong { font-size: .9cqw; }
+.rules-table b { font-size: .77cqw; text-align: right; }
+.great { color: var(--human); }
+.good { color: var(--fish); }
+.bad { color: var(--bad); }
+.help-card .help-note { font-size: clamp(11px, .77cqw, 14px); margin-bottom: 1.4cqw; }
+.footer { display: flex; justify-content: space-between; gap: 15px; align-items: center; height: 62px; font-size: 9px; letter-spacing: .1em; color: #9ab4b9; }
+.footer i { display: inline-block; width: 5px; height: 5px; background: var(--fish); border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.footer-divider { margin: 0 12px; color: #4c6a73; }
+.footer button { font-size: 10px; letter-spacing: .1em; background: none; border: none; padding: 8px 0 8px 8px; }
+.mobile-note { display: none; margin: 0 24px 24px; color: #c0d1cd; font-size: 12px; line-height: 1.8; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.arena.playing .intro { display: none; }
+.arena:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border: 0; border-radius: 0; }
+.arena:fullscreen #lake { position: absolute; inset: 0; }
+@keyframes cue-in { from { transform: scale(.8); } to { transform: scale(1); } }
+@keyframes judge-in { from { transform: translateY(7px) scale(.94); opacity: .3; } to { transform: translateY(0) scale(1); opacity: 1; } }
+@media (min-aspect-ratio: 18/10) and (min-width: 900px) { .shell { max-width: calc((100vh - 138px) * 16 / 9); } .masthead { height: 76px; } }
+@media (max-width: 1000px) { .shell { width: calc(100% - 32px); } .masthead { height: 64px; } .edition { display: none; } .footer-controls { display: none; } }
+@media (pointer: coarse) { .mobile-note { display: block; } }
+@media (max-width: 640px) {
+  .shell { width: calc(100% - 24px); }
+  .brand { font-size: 11px; } .brand span { margin: 0 5px; }
+  .utilities { gap: 5px; } .utilities button { height: 30px; min-width: 30px; } .utilities #sound { padding: 0 6px; font-size: 8px; }
+  .arena { aspect-ratio: 4/6.7; min-height: 540px; }
+  #lake { position: absolute; width: 300%; height: 100%; left: -100%; }
+  .hud { inset: 18px 14px auto; grid-template-columns: 1fr 24% 1fr; gap: 3%; }
+  .health-label { font-size: 13px; } .health-label b { display: none; } .health-label output { font-size: 10px; } .health-label output span { display: none; }
+  .health-foot { font-size: 8px; } .health-foot span:first-child { display: none; }
+  .clock output { font-size: 30px; }
+  .intro-card { width: 80%; } .eyebrow { font-size: 9px; }
+  h1 { font-size: 19cqw; margin: 20px 0; } .tagline { font-size: 3.5cqw; margin-bottom: 15px; }
+  .intro-copy { font-size: 3cqw; margin-bottom: 20px; }
+  .players { gap: 28px; margin-bottom: 20px; } .player-tag { font-size: 10px; } .key-pad { gap: 3px; margin-top: 8px; } .key-pad span { gap: 3px; } kbd { width: 24px; height: 24px; font-size: 12px; }
+  .versus { font-size: 10px; } .primary { padding: 15px; font-size: 12px; } .start-foot { margin-top: 12px; } .start-foot > span { font-size: 7px; } .start-foot button { font-size: 11px; } .keyboard-note { font-size: 10px; margin-top: 12px; }
+  .arena-caption { bottom: 12px; font-size: 6px; } .arena-caption span:last-child { display: none; }
+  .footer { height: 50px; font-size: 7px; } .footer-divider { margin: 0 4px; }
+  .cue { top: 27%; gap: 4cqw; } .prompt { width: 26cqw; height: 26cqw; } #direction { font-size: 19cqw; padding-bottom: 3cqw; } #prompt-label { font-size: 1.4cqw; bottom: 3cqw; } .cue.dormant #direction { font-size: 10cqw; }
+  .judgment { width: 22cqw; } .judgment strong { font-size: 6cqw; } .judge-owner { font-size: 1.8cqw; } .judgment small { font-size: 1.9cqw; } .judgment.has-result.miss strong { font-size: 4.5cqw; }
+  .round-feedback { font-size: 2.5cqw; top: 47%; }
+  .pause-card, .result-card { width: 83%; } h2, .result-card h2 { font-size: 10cqw; } .pause-card p, .result-card p { font-size: 3cqw; margin: 20px 0; } .text-button { font-size: 12px; margin-top: 20px; }
+  .result-score { gap: 30px; margin: 20px 0; } .result-score span { font-size: 10px; } .result-score strong { font-size: 40px; } .stats { font-size: 12px; margin-bottom: 25px; gap: 8px; } .stats b { font-size: 10px; }
+  .help-card { width: 92%; padding: 20px; } .help-card h2 { font-size: 22px; } .help-heading button { font-size: 16px; } .help-card p { font-size: 11px; } .help-card .help-note { font-size: 10px; margin: 15px 0; } .rules-table > div { font-size: 9px; padding: 10px 0; } .rules-table strong { font-size: 11px; } .rules-table b { font-size: 10px; }
+  .countdown strong { font-size: 30cqw; } .countdown > span, .countdown small { font-size: 3cqw; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Final Adjustment 1 — 指示は即時表示、衝撃は左右の判定欄の中で完結。 */
+#direction {
+  width: 7.5cqw;
+  height: 7.5cqw;
+  margin-bottom: 1cqw;
+  padding: 0;
+  fill: #fff7d6;
+  stroke: #fffbe8;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 3px 0 #052334);
+}
+#direction-arrow { transition: none; }
+#prompt-idle { width: 3.5cqw; height: 3.5cqw; margin-bottom: 1cqw; fill: none; stroke: #d0e2d6; stroke-width: 1.5; }
+#prompt-idle circle { stroke-width: .5; opacity: .45; }
+.cue.active .prompt { animation: none; }
+.prompt::after { content: ''; position: absolute; inset: -.7cqw; border: 2px solid #f5edc277; border-radius: 50%; opacity: 0; pointer-events: none; }
+.cue.active .prompt::after { animation: signal-arrival .3s ease-out; }
+.cue.resolved #direction { opacity: .42; }
+.judgment { position: relative; isolation: isolate; padding: .55cqw .5cqw; }
+.fish-judgment { --verdict-color: #91f1df; }
+.human-judgment { --verdict-color: #ffda96; }
+.judgment::before { content: ''; position: absolute; inset: 0; border-radius: 5px; opacity: 0; z-index: -1; background: #0a2c3be8; border-bottom: 2px solid var(--verdict-color); }
+.verdict-burst { position: absolute; width: 100%; height: 110%; left: 0; top: -5%; fill: none; stroke: var(--verdict-color); stroke-width: 2.5; stroke-linecap: round; opacity: 0; pointer-events: none; }
+.judgment.has-result.great::before { opacity: 1; box-shadow: 0 0 1.4cqw #f9dda51c; }
+.judgment.has-result.great .judge-owner, .judgment.has-result.great small { color: #dceadd; }
+.judgment.has-result.great strong { color: var(--verdict-color); font-size: 2.75cqw; text-shadow: 0 2px 0 #071d28; animation: great-strike .42s cubic-bezier(.16,.85,.3,1); }
+.judgment.has-result.great .verdict-burst { animation: verdict-rays .38s ease-out; }
+.judgment.has-result.good strong { color: #fff6d8; animation: good-confirm .2s ease-out; }
+.judgment.has-result.good::before { opacity: .5; }
+.judgment.has-result.good small, .judgment.has-result.good .judge-owner { color: #edf4df; }
+.judgment.has-result.bad { --verdict-color: #ee927b; }
+.judgment.has-result.bad strong { color: #8d322b; text-shadow: 0 1px 0 #ffd6ae55; animation: bad-recoil .23s ease-out; }
+@keyframes signal-arrival { from { opacity: .6; transform: scale(.97); } to { opacity: 0; transform: scale(1.14); } }
+@keyframes great-strike { 0% { transform: translateY(3px) scale(1.12); } 30% { transform: translateY(-1px) scale(.98); } 65% { transform: translateY(0) scale(1.025); } 100% { transform: none; } }
+@keyframes verdict-rays { 0% { opacity: .9; transform: scale(.85); } 70% { opacity: .3; } 100% { opacity: 0; transform: scale(1.08); } }
+@keyframes good-confirm { from { transform: translateY(3px); } to { transform: none; } }
+@keyframes bad-recoil { 0% { transform: translateX(3px); } 35% { transform: translateX(-2px); } 100% { transform: none; } }
+@media (max-width: 640px) {
+  #direction { width: 19cqw; height: 19cqw; margin-bottom: 3cqw; }
+  #prompt-idle { width: 10cqw; height: 10cqw; margin-bottom: 3cqw; }
+  .judgment { padding: 1.7cqw 1cqw; }
+  .judgment.has-result.great strong { font-size: 5.8cqw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prompt::after, .verdict-burst { display: none; }
+  #direction { filter: none; }
+}
+
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="masthead"><a class="brand" href="#" aria-label="FISHING DUEL タイトルへ">FD<span> / </span>FISHING DUEL</a><span class="edition">LOCAL TWO-PLAYER · FA2 / RC3</span><div class="utilities"><button id="sound" aria-pressed="false" aria-label="音をオンにする">SOUND OFF</button><button id="pause" disabled aria-label="一時停止">Ⅱ</button><button id="fullscreen" aria-label="全画面表示">⛶</button></div></header>
+  <section id="arena" class="arena" aria-label="FISHING DUEL ゲーム画面">
+    <svg id="lake" viewBox="0 0 1440 810" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="湖の左の水中で抵抗する魚と、右のボートで竿を引く人間">
+<defs>
+  <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#81b9c9"/><stop offset=".65" stop-color="#e4d9b8"/><stop offset="1" stop-color="#f6cc94"/></linearGradient>
+  <linearGradient id="water" x2=".25" y2="1"><stop stop-color="#319cac"/><stop offset=".3" stop-color="#146d83"/><stop offset="1" stop-color="#082b43"/></linearGradient>
+  <linearGradient id="body" x2="0" y2="1"><stop stop-color="#0b5267"/><stop offset=".48" stop-color="#66c2c9"/><stop offset=".75" stop-color="#b4e5d8"/><stop offset="1" stop-color="#539fba"/></linearGradient>
+  <linearGradient id="boatColor" x2="0" y2="1"><stop stop-color="#f6bb63"/><stop offset="1" stop-color="#be6345"/></linearGradient>
+  <linearGradient id="sunRay" x2="0" y2="1"><stop stop-color="#d9ffdd" stop-opacity=".16"/><stop offset="1" stop-color="#c5f6de" stop-opacity="0"/></linearGradient>
+  <radialGradient id="vignette"><stop offset=".4" stop-color="#061f30" stop-opacity="0"/><stop offset="1" stop-color="#061f30" stop-opacity=".35"/></radialGradient>
+  <pattern id="grain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="2" r=".6" fill="#fff" opacity=".06"/><circle cx="5" cy="5" r=".6" fill="#001c2f" opacity=".08"/></pattern>
+  <g id="pine"><path d="M0 0-17 43-8 39-26 68-13 64-34 96H34L13 64 26 68 8 39 17 43Z"/><path d="M-2 50H2V118H-2Z"/></g>
+  <g id="minifish"><path d="M-25 0Q-7-15 15-7L28-18 25 0 28 17 15 8Q-8 17-25 0Z"/></g>
+</defs>
+<rect width="1440" height="440" fill="url(#sky)"/>
+<circle cx="926" cy="259" r="83" fill="#fff1c4" opacity=".65"/>
+<path d="M0 337 115 275 190 294 365 170 431 215 485 200 649 321 761 257 850 320 1010 231 1111 299 1240 203 1440 299V460H0Z" fill="#729e9e"/>
+<path d="m247 264 118-94 66 45-39-13-23-19-42 47-22-5Z" fill="#c9d6bc" opacity=".5"/>
+<path d="M0 375 125 305 262 366 428 289 574 352 703 319 848 379 1044 301 1155 358 1331 282 1440 340V451H0Z" fill="#477c7e"/>
+
+<use href="#pine" transform="translate(-3.2 355.3) scale(0.51)" fill="#3a7271"/>
+<use href="#pine" transform="translate(14.5 301.2) scale(0.97)" fill="#306768"/>
+<use href="#pine" transform="translate(37.2 291.7) scale(1.05)" fill="#3a7271"/>
+<use href="#pine" transform="translate(54.8 330.2) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(89.7 309.9) scale(0.90)" fill="#3a7271"/>
+<use href="#pine" transform="translate(101.5 279.1) scale(1.16)" fill="#306768"/>
+<use href="#pine" transform="translate(128.4 314.4) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(138.1 357.4) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(175.0 277.4) scale(1.17)" fill="#3a7271"/>
+<use href="#pine" transform="translate(181.3 306.5) scale(0.93)" fill="#306768"/>
+<use href="#pine" transform="translate(201.4 351.5) scale(0.55)" fill="#3a7271"/>
+<use href="#pine" transform="translate(223.9 290.8) scale(1.06)" fill="#306768"/>
+<use href="#pine" transform="translate(261.0 295.6) scale(1.02)" fill="#3a7271"/>
+<use href="#pine" transform="translate(268.4 353.7) scale(0.53)" fill="#306768"/>
+<use href="#pine" transform="translate(298.0 324.5) scale(0.78)" fill="#3a7271"/>
+<use href="#pine" transform="translate(323.6 274.8) scale(1.20)" fill="#306768"/>
+<use href="#pine" transform="translate(328.4 346.5) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(365.9 342.3) scale(0.62)" fill="#306768"/>
+<use href="#pine" transform="translate(386.0 291.0) scale(1.06)" fill="#3a7271"/>
+<use href="#pine" transform="translate(403.5 349.0) scale(0.57)" fill="#306768"/>
+<use href="#pine" transform="translate(416.0 309.3) scale(0.90)" fill="#3a7271"/>
+<use href="#pine" transform="translate(435.1 272.6) scale(1.22)" fill="#306768"/>
+<use href="#pine" transform="translate(455.3 276.3) scale(1.18)" fill="#3a7271"/>
+<use href="#pine" transform="translate(479.2 277.2) scale(1.18)" fill="#306768"/>
+<use href="#pine" transform="translate(505.0 355.0) scale(0.52)" fill="#3a7271"/>
+<use href="#pine" transform="translate(522.6 272.7) scale(1.21)" fill="#306768"/>
+<use href="#pine" transform="translate(544.1 362.0) scale(0.46)" fill="#3a7271"/>
+<use href="#pine" transform="translate(572.1 346.4) scale(0.59)" fill="#306768"/>
+<use href="#pine" transform="translate(592.4 342.1) scale(0.63)" fill="#3a7271"/>
+<use href="#pine" transform="translate(604.1 300.7) scale(0.98)" fill="#306768"/>
+<use href="#pine" transform="translate(632.1 357.0) scale(0.50)" fill="#3a7271"/>
+<use href="#pine" transform="translate(655.1 328.8) scale(0.74)" fill="#306768"/>
+<use href="#pine" transform="translate(670.1 281.2) scale(1.14)" fill="#3a7271"/>
+<use href="#pine" transform="translate(689.7 329.8) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(707.3 343.1) scale(0.62)" fill="#3a7271"/>
+<use href="#pine" transform="translate(735.1 362.3) scale(0.45)" fill="#306768"/>
+<use href="#pine" transform="translate(754.1 317.7) scale(0.83)" fill="#3a7271"/>
+<use href="#pine" transform="translate(770.3 336.4) scale(0.67)" fill="#306768"/>
+<use href="#pine" transform="translate(795.2 315.1) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(818.1 329.3) scale(0.73)" fill="#306768"/>
+<use href="#pine" transform="translate(846.2 365.6) scale(0.43)" fill="#3a7271"/>
+<use href="#pine" transform="translate(857.3 335.2) scale(0.68)" fill="#306768"/>
+<use href="#pine" transform="translate(889.2 285.6) scale(1.11)" fill="#3a7271"/>
+<use href="#pine" transform="translate(902.6 276.5) scale(1.18)" fill="#306768"/>
+<use href="#pine" transform="translate(916.0 295.8) scale(1.02)" fill="#3a7271"/>
+<use href="#pine" transform="translate(940.5 271.6) scale(1.22)" fill="#306768"/>
+<use href="#pine" transform="translate(957.9 304.4) scale(0.95)" fill="#3a7271"/>
+<use href="#pine" transform="translate(985.6 302.8) scale(0.96)" fill="#306768"/>
+<use href="#pine" transform="translate(1003.2 280.2) scale(1.15)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1036.8 324.6) scale(0.77)" fill="#306768"/>
+<use href="#pine" transform="translate(1042.3 274.6) scale(1.20)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1072.4 358.3) scale(0.49)" fill="#306768"/>
+<use href="#pine" transform="translate(1084.3 346.5) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1119.9 361.4) scale(0.46)" fill="#306768"/>
+<use href="#pine" transform="translate(1128.8 314.1) scale(0.86)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1161.8 303.2) scale(0.96)" fill="#306768"/>
+<use href="#pine" transform="translate(1167.4 317.1) scale(0.84)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1192.4 321.7) scale(0.80)" fill="#306768"/>
+<use href="#pine" transform="translate(1215.8 330.0) scale(0.73)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1232.8 356.8) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(1262.1 355.7) scale(0.51)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1285.4 356.6) scale(0.50)" fill="#306768"/>
+<use href="#pine" transform="translate(1305.7 308.9) scale(0.91)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1315.2 271.2) scale(1.23)" fill="#306768"/>
+<use href="#pine" transform="translate(1343.5 346.0) scale(0.59)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1362.4 362.9) scale(0.45)" fill="#306768"/>
+<use href="#pine" transform="translate(1380.4 332.9) scale(0.70)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1400.7 318.1) scale(0.83)" fill="#306768"/>
+<use href="#pine" transform="translate(1426.0 334.8) scale(0.69)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1443.4 308.8) scale(0.91)" fill="#306768"/>
+<use href="#pine" transform="translate(1478.3 277.2) scale(1.18)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1494.6 278.7) scale(1.16)" fill="#306768"/>
+<use href="#pine" transform="translate(1512.8 271.1) scale(1.23)" fill="#3a7271"/>
+<use href="#pine" transform="translate(1525.7 352.3) scale(0.54)" fill="#306768"/>
+<path d="M0 416Q210 390 401 414T789 416T1111 412T1440 414V445H0Z" fill="#244f56"/>
+<use href="#pine" transform="translate(12 228) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(74 205) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(160 248) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1325 215) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1390 237) scale(1.8)" fill="#214e55"/>
+<use href="#pine" transform="translate(1450 244) scale(1.8)" fill="#214e55"/>
+<rect y="417" width="1440" height="393" fill="url(#water)"/>
+<path d="M361 419 95 810H280L407 419ZM760 419 612 810H896L805 419ZM1088 419 1169 810H1385L1134 419Z" fill="url(#sunRay)"/>
+<g fill="none" stroke="#a1e5d8" stroke-width="2" opacity=".22">
+<path d="M1009 442q50.0 -5 100 0"/>
+<path d="M713 473q48.0 -5 96 0"/>
+<path d="M1302 477q53.0 -5 106 0"/>
+<path d="M460 474q27.0 -5 54 0"/>
+<path d="M1353 455q43.5 -5 87 0"/>
+<path d="M1163 480q46.5 -5 93 0"/>
+<path d="M977 462q17.0 -5 34 0"/>
+<path d="M182 435q44.0 -5 88 0"/>
+<path d="M582 493q11.0 -5 22 0"/>
+<path d="M1033 461q15.5 -5 31 0"/>
+<path d="M528 488q12.5 -5 25 0"/>
+<path d="M301 458q21.5 -5 43 0"/>
+<path d="M814 461q31.0 -5 62 0"/>
+<path d="M1393 445q58.0 -5 116 0"/>
+<path d="M249 433q34.5 -5 69 0"/>
+<path d="M225 465q39.0 -5 78 0"/>
+<path d="M1080 447q25.5 -5 51 0"/>
+<path d="M902 492q56.5 -5 113 0"/>
+<path d="M1110 461q39.5 -5 79 0"/>
+<path d="M620 470q38.0 -5 76 0"/>
+<path d="M346 447q31.0 -5 62 0"/>
+<path d="M862 466q40.0 -5 80 0"/>
+<path d="M797 488q49.0 -5 98 0"/>
+<path d="M366 432q55.5 -5 111 0"/>
+<path d="M1124 467q29.5 -5 59 0"/>
+<path d="M636 446q25.0 -5 50 0"/>
+<path d="M75 475q37.5 -5 75 0"/>
+<path d="M250 439q26.0 -5 52 0"/>
+</g>
+<use href="#minifish" transform="translate(600 610) scale(0.9)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(890 691) scale(0.7)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(1055 564) scale(0.7)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(1260 655) scale(1.1)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(720 755) scale(0.5)" fill="#073a50" opacity=".55"/>
+<use href="#minifish" transform="translate(110 485) scale(0.4)" fill="#073a50" opacity=".55"/>
+<circle cx="275" cy="595" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="1189" cy="670" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="882" cy="759" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1432" cy="531" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1" cy="558" r="1.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="41" cy="719" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="632" cy="686" r="2.4" fill="#abd6c7" opacity=".14"/>
+<circle cx="1016" cy="594" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="294" cy="604" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="464" cy="711" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="715" cy="566" r="1.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="1377" cy="659" r="3.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="1129" cy="538" r="2.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="195" cy="667" r="1.5" fill="#abd6c7" opacity=".14"/>
+<circle cx="2" cy="703" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="1050" cy="547" r="2.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="1159" cy="658" r="1.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="1028" cy="710" r="2.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="387" cy="768" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="37" cy="668" r="2.9" fill="#abd6c7" opacity=".14"/>
+<circle cx="258" cy="720" r="1.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="1179" cy="505" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="348" cy="497" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="533" cy="510" r="1.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="880" cy="609" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="464" cy="576" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="414" cy="633" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="1012" cy="710" r="2.4" fill="#abd6c7" opacity=".14"/>
+<circle cx="1151" cy="589" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="878" cy="673" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="401" cy="580" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="142" cy="585" r="1.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="997" cy="765" r="2.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="862" cy="704" r="1.6" fill="#abd6c7" opacity=".14"/>
+<circle cx="385" cy="645" r="2.8" fill="#abd6c7" opacity=".14"/>
+<circle cx="337" cy="542" r="2.2" fill="#abd6c7" opacity=".14"/>
+<circle cx="429" cy="692" r="2.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="639" cy="501" r="2.7" fill="#abd6c7" opacity=".14"/>
+<circle cx="72" cy="686" r="1.0" fill="#abd6c7" opacity=".14"/>
+<circle cx="17" cy="540" r="1.1" fill="#abd6c7" opacity=".14"/>
+<circle cx="355" cy="721" r="2.3" fill="#abd6c7" opacity=".14"/>
+<circle cx="738" cy="744" r="1.9" fill="#abd6c7" opacity=".14"/>
+<path d="M0 754Q100 725 198 768T439 756T691 776T922 751T1190 771T1440 747V810H0Z" fill="#12394a"/>
+<path d="M0 794Q110 754 264 795T563 799T866 786T1161 801T1440 777V810H0Z" fill="#0b2b3d"/>
+
+<path d="M829 815q-24 -51 -5 -128q28 45 5 128" fill="#0b3b50"/>
+<path d="M418 815q-24 -13 -5 -32q28 11 5 32" fill="#12485a"/>
+<path d="M90 815q-24 -14 -5 -36q28 13 5 36" fill="#12485a"/>
+<path d="M305 815q-24 -22 -5 -56q28 20 5 56" fill="#10384b"/>
+<path d="M787 815q-24 -14 -5 -36q28 13 5 36" fill="#0b3b50"/>
+<path d="M915 815q-24 -41 -5 -102q28 36 5 102" fill="#10384b"/>
+<path d="M378 815q-24 -44 -5 -110q28 38 5 110" fill="#0b3b50"/>
+<path d="M1344 815q-24 -16 -5 -40q28 14 5 40" fill="#12485a"/>
+<path d="M474 815q-24 -42 -5 -106q28 37 5 106" fill="#10384b"/>
+<path d="M1442 815q-24 -39 -5 -98q28 34 5 98" fill="#0b3b50"/>
+<path d="M653 815q-24 -44 -5 -109q28 38 5 109" fill="#0b3b50"/>
+<path d="M281 815q-24 -26 -5 -65q28 23 5 65" fill="#10384b"/>
+<path d="M142 815q-24 -13 -5 -33q28 12 5 33" fill="#12485a"/>
+<path d="M719 815q-24 -40 -5 -99q28 35 5 99" fill="#0b3b50"/>
+<path d="M1265 815q-24 -17 -5 -43q28 15 5 43" fill="#10384b"/>
+<path d="M110 815q-24 -44 -5 -109q28 38 5 109" fill="#12485a"/>
+<path d="M556 815q-24 -34 -5 -84q28 29 5 84" fill="#10384b"/>
+<path d="M263 815q-24 -21 -5 -52q28 18 5 52" fill="#0b3b50"/>
+<path d="M213 815q-24 -20 -5 -50q28 18 5 50" fill="#12485a"/>
+<path d="M1126 815q-24 -12 -5 -29q28 10 5 29" fill="#0b3b50"/>
+<path d="M1156 815q-24 -14 -5 -35q28 12 5 35" fill="#0b3b50"/>
+<path d="M465 815q-24 -54 -5 -134q28 47 5 134" fill="#12485a"/>
+<path d="M907 815q-24 -32 -5 -81q28 28 5 81" fill="#12485a"/>
+<path d="M1167 815q-24 -12 -5 -31q28 11 5 31" fill="#12485a"/>
+<path d="M911 815q-24 -20 -5 -49q28 17 5 49" fill="#12485a"/>
+<path d="M181 815q-24 -19 -5 -48q28 17 5 48" fill="#12485a"/>
+<path d="M176 815q-24 -20 -5 -51q28 18 5 51" fill="#12485a"/>
+<path d="M530 815q-24 -30 -5 -74q28 26 5 74" fill="#12485a"/>
+<path d="M924 815q-24 -29 -5 -73q28 26 5 73" fill="#10384b"/>
+<path d="M632 815q-24 -20 -5 -50q28 18 5 50" fill="#12485a"/>
+<path d="M491 815q-24 -37 -5 -92q28 32 5 92" fill="#10384b"/>
+<path d="M9 815q-24 -28 -5 -69q28 24 5 69" fill="#12485a"/>
+<path d="M1157 815q-24 -13 -5 -33q28 12 5 33" fill="#0b3b50"/>
+<path d="M1216 815q-24 -38 -5 -95q28 33 5 95" fill="#10384b"/>
+<path d="M71 815q-24 -51 -5 -128q28 45 5 128" fill="#12485a"/>
+<path d="M197 815q-24 -32 -5 -81q28 28 5 81" fill="#0b3b50"/>
+<!-- 紐の端点・魚・人間・ボートはJSで独立して動かします。 -->
+<g id="fish-wake" fill="none" stroke="#9adecf" stroke-width="2" stroke-linecap="round" stroke-dasharray="28 22" opacity="0"><path d="M115-32Q152-47 190-40M132 0H218M118 31Q153 45 190 43"/></g>
+<g id="boat-wake" fill="none" stroke="#d2e8ce" stroke-width="2.5" stroke-linecap="round" opacity=".4"><path d="M1070 431q40 15 81 3M1092 442q43 10 76 2M1365 455q36 8 73-2"/></g>
+<g id="boat" transform="translate(0 0)">
+  <ellipse cx="1252" cy="434" rx="178" ry="17" fill="#063e55" opacity=".55"/>
+  <path d="M1068 388 1448 398 1390 447Q1181 455 1117 430Z" fill="url(#boatColor)" stroke="#874e40" stroke-width="3"/>
+  <path d="M1068 388 1448 398 1444 409 1082 400Z" fill="#ffdb8d"/>
+  <path d="m1116 421 282 12" stroke="#9d5140" stroke-width="3" opacity=".6"/>
+  <g id="stance">
+  <path d="M1170 392 1191 352 1245 344 1284 397" fill="#243d4c" stroke="#162f3f" stroke-width="5"/>
+  <path d="m1202 351 67 26 34 22h-60l-56-27" fill="#243d4c" stroke="#162f3f" stroke-width="5"/>
+  </g>
+  <g id="angler" transform="rotate(0 1242 340)">
+    <path d="M1230 268Q1260 265 1276 299L1287 351 1234 365 1207 304Z" fill="#dc7756" stroke="#633e39" stroke-width="3"/>
+    <path d="m1242 274-11 78 32-2 7-63" fill="#253c41"/>
+    <path d="m1221 286-39 19-22-40-17 10 26 59q7 6 17 0l43-20" fill="#e28a61" stroke="#633e39" stroke-width="3"/>
+    <path d="m1264 295-46 13-56-44-10 13 58 58q8 5 17 1l48-17" fill="#ed9a72" stroke="#633e39" stroke-width="3"/>
+    <path d="m1244 252-1 24 18 1 1-30" fill="#dba47b"/>
+    <path d="M1225 223Q1222 253 1240 263L1260 258 1270 231Z" fill="#f2c69c"/>
+    <path d="m1262 229-4 26 14-20" fill="#483f3a"/>
+    <path d="M1214 224q-9-7 3-11l10-31q14-12 37 0l11 30q31 14 0 19Z" fill="#bd8b54" stroke="#654d38" stroke-width="3"/>
+    <path d="m1221 204 47 5 6 12-57-8" fill="#604f3b"/>
+    <path d="M1214 224q30-8 61 7" fill="none" stroke="#f4ca8b" stroke-width="3"/>
+  </g>
+</g>
+<path id="rod" d="M1161 275Q1073 119 948 160" fill="none" stroke="#382f30" stroke-width="9" stroke-linecap="round"/>
+<path id="rod-shine" d="M1161 275Q1073 119 948 160" fill="none" stroke="#cd8c59" stroke-width="3" stroke-linecap="round"/>
+<g id="fishing-line"><path id="line-shadow" d="M948 160 181 538" fill="none" stroke="#064156" stroke-width="5" opacity=".16"/><path id="line" d="M948 160 181 538" fill="none" stroke="#edf6d7" stroke-width="2"/><path id="line-flash" d="M948 160 181 538" fill="none" stroke="#fff9bd" stroke-width="6" opacity="0"/></g>
+<g id="fish" transform="translate(285 582) rotate(24)">
+  <g id="fish-flex">
+  <g id="fish-tail"><path d="M72-11 125-58 115-6 131 45 74 16" fill="#428c9e" stroke="#153f54" stroke-width="4"/><path d="m88 1 26-30M88 5l29 24" stroke="#89c8c8" stroke-width="2" fill="none"/></g>
+  <path d="M-35-36-12-75 11-47 27-69 48-37" fill="#31788e" stroke="#153f54" stroke-width="4"/>
+  <path d="M-111 2Q-87-59-24-49 50-49 88-1 49 55-27 48-88 43-111 2Z" fill="url(#body)" stroke="#153f54" stroke-width="4"/>
+  <path d="M-99 18Q-28 51 60 17-5 67-69 33" fill="#d4ede0" opacity=".65"/>
+  <path d="M-37-39Q-12-6-37 38" stroke="#22687c" stroke-width="3" fill="none"/>
+  <path d="M-12 18 30 58 48 30" fill="#4b96ab" stroke="#20516b" stroke-width="3"/>
+  <path d="m26-25 12 8m8-5 12 8m-29 4 12 8m10-7 12 8m-23 1 12 8" stroke="#c8eece" opacity=".3" stroke-width="3"/>
+  <ellipse cx="-71" cy="-11" rx="14" ry="18" fill="#e4f2da"/>
+  <ellipse cx="-77" cy="-9" rx="7" ry="10" fill="#102b3e"/>
+  <circle cx="-79" cy="-13" r="3" fill="#fff"/>
+  <path d="m-96-4-15 6 12 9" fill="#143e52" stroke="#153f54" stroke-width="3"/>
+  <path d="M-115-3q-6 18 10 12" fill="none" stroke="#e6dec1" stroke-width="3"/>
+  <path d="m-114 0-12-1" stroke="#c99469" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</g>
+<g id="bait" transform="translate(159 581)" opacity="0"><path d="M0 0q-10-9-15 0t-14 2" fill="none" stroke="#e8a26d" stroke-width="6" stroke-linecap="round"/></g>
+<g id="spray" fill="#d6f1df" opacity=".7"></g>
+<g id="bubbles" fill="none" stroke="#b7e5d9" stroke-width="1.5" opacity=".5"></g>
+<!-- キャラクターに追従する判定専用漫符。入力や時間判定とは独立。 -->
+<g id="fish-signal" opacity="0" pointer-events="none" aria-hidden="true">
+  <g id="fish-great-mark" fill="#b8f5db" stroke="#123e50" stroke-width="3" stroke-linejoin="round"><path d="M-7-23H7L5 8H-5Z"/><circle cy="18" r="5"/></g>
+  <g id="fish-bad-mark" fill="none" stroke="#173c4d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12" stroke="#e8ead2" stroke-width="6"/><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12"/></g>
+</g>
+<g id="human-signal" opacity="0" pointer-events="none" aria-hidden="true">
+  <g id="human-great-mark" fill="#ffe0a0" stroke="#4d3d33" stroke-width="3" stroke-linejoin="round"><path d="M-7-23H7L5 8H-5Z"/><circle cy="18" r="5"/></g>
+  <g id="human-bad-mark" fill="none" stroke="#513f38" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12" stroke="#eee4ca" stroke-width="6"/><path d="M-33 7C-46-12-9-27 4-12S-18 24-25 4 12-24 23-8-9 21-12-3 36-19 36 0 10 23 2 7 28-18 31 4M-30-2Q-8 21 18-10T32 11M-16-13Q-28 18 10 12"/></g>
+</g>
+<path id="surface" d="M0 419Q80 413 160 419T480 419T800 419T1120 419T1440 419" stroke="#c6e9d5" stroke-width="3" fill="none" opacity=".65"/>
+<rect width="1440" height="810" fill="url(#grain)" pointer-events="none"/>
+<rect width="1440" height="810" fill="url(#vignette)" pointer-events="none"/>
+</svg>
+    <div class="hud">
+      <section class="health fish-health" aria-label="魚の体力"><div class="health-label"><span><b>02</b> FISH</span><output id="fish-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="魚の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="fish-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>逃げ切れ。</span><span>W A S D</span></div></section>
+      <section class="clock" aria-label="残り時間"><span>TIME LEFT</span><output id="timer">60<span>.0</span></output><small id="round-counter">00 / 20</small></section>
+      <section class="health human-health" aria-label="人間の体力"><div class="health-label"><span><b>01</b> HUMAN</span><output id="human-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="人間の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="human-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>釣り上げろ。</span><span>↑ ← ↓ →</span></div></section>
+    </div>
+    <div id="cue" class="cue dormant" aria-label="共通方向指示">
+      <div class="judgment fish-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">02 / FISH</span><strong id="fish-judge">READY</strong><small id="fish-detail">WASD</small></div>
+      <div class="prompt"><svg class="prompt-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="55"/><circle id="deadline-ring" cx="60" cy="60" r="55" pathLength="100"/></svg><svg id="direction" viewBox="0 0 100 100" aria-hidden="true" hidden><path id="direction-arrow" d="M50 9 85 44H66V87H34V44H15Z"/></svg><svg id="prompt-idle" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9V31M9 20H31"/><circle cx="20" cy="20" r="17"/></svg><span id="direction-name" class="sr-only">待機中</span><span id="prompt-label">STAND BY</span></div>
+      <div class="judgment human-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">01 / HUMAN</span><strong id="human-judge">READY</strong><small id="human-detail">矢印キー</small></div>
+    </div>
+    <div id="round-feedback" class="round-feedback" aria-live="off"></div>
+    <div class="arena-caption"><span>ONE LAKE. TWO WILLS.</span><span id="phase">THE LINE IS DRAWN.</span></div>
+    <div id="countdown" class="countdown" hidden><span>THE DUEL BEGINS</span><strong id="count-number">3</strong><small>左の魚はWASD ／ 右の人間は矢印キー</small></div>
+    <div id="intro" class="overlay intro">
+      <div class="intro-card"><span class="eyebrow">A GAME OF REFLEX & RESOLVE</span><h1>FISHING<br><em>DUEL.</em></h1><p class="tagline">ひとつの矢印。ふたつの意地。</p><p class="intro-copy">釣り上げたい人間と、逃げ切りたい魚。<br>同じ方向指示に、ふたり同時に応えよう。</p>
+        <div class="players"><div><span class="player-tag fish-color">02 / FISH</span><div class="key-pad"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div></div><span class="versus">VS</span><div><span class="player-tag human-color">01 / HUMAN</span><div class="key-pad"><kbd>↑</kbd><span><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></span></div></div></div>
+        <button id="start" class="primary">対戦をはじめる <span>↗</span></button><div class="start-foot"><span>60 SECONDS / 20 SIGNALS</span><button id="help-open">遊び方 ↗</button></div><p class="keyboard-note">PC・キーボード1台・プレイヤー2人</p>
+      </div>
+    </div>
+    <div id="paused" class="overlay pause-overlay" hidden><div class="pause-card"><span class="eyebrow">TAKE A BREATH</span><h2>PAUSED.</h2><p id="pause-message">ふたりの準備ができたら再開してください。</p><button id="resume" class="primary">対戦を再開 <span>↗</span></button><button id="quit" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="result" class="overlay result-overlay" hidden><div class="result-card"><span id="result-reason" class="eyebrow">TIME UP</span><h2 id="result-title">DRAW</h2><p id="result-copy"></p><div class="result-score"><div class="fish-color"><span>02 / FISH</span><strong id="result-fish">100</strong></div><span class="score-colon">:</span><div class="human-color"><span>01 / HUMAN</span><strong id="result-human">100</strong></div></div><div id="stats" class="stats"></div><button id="rematch" class="primary">もう一度、勝負する <span>↗</span></button><button id="back" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="help" class="overlay help-overlay" hidden><div class="help-card" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="help-heading"><span class="eyebrow">FIELD GUIDE / 01</span><button id="help-close" aria-label="遊び方を閉じる">✕</button></div><h2 id="help-title">反射神経で、<br>この糸の運命を決める。</h2><p>中央に出た矢印と同じ方向を入力。<br>左の魚は <b>W A S D</b>、右の人間は <b>矢印キー</b>。受付は1秒です。</p><div class="rules-table"><div><strong class="great">GREAT</strong><span>0.5秒以内に正解</span><b>相手 −7.5</b></div><div><strong class="good">GOOD</strong><span>0.5秒超〜1秒以内に正解</span><b>相手 −5</b></div><div><strong class="bad">BAD</strong><span>誤った方向を入力</span><b>自分 −2.5</b></div><div><strong>未入力</strong><span>1秒以内に入力なし</span><b>変化なし</b></div></div><p class="help-note">各指示で入力はひとり1回。押しっぱなし・連打は無効です。<br>双方のダメージを同時に反映し、体力0で決着。60秒経ったら残り体力で勝負します。両者同時に0なら DOUBLE K.O.、時間切れで同値なら DRAW です。</p><button id="help-done" class="primary">準備できました <span>↗</span></button></div></div>
+  </section>
+  <footer class="footer"><span><i></i> LOCAL DUEL <span class="footer-divider">/</span> AI-ASSISTED GAME CREATION</span><span class="footer-controls">ESC 一時停止 <span class="footer-divider">·</span> ヘッドホン推奨</span><button id="guide">RULES ↗</button></footer>
+</main>
+<p id="mobile-note" class="mobile-note">このゲームはPCのキーボードで2人対戦します。画面の閲覧はこの端末でも可能です。</p>
+<div id="announcer" class="sr-only" aria-live="polite"></div>
+<script>
+/* FISHING DUEL — ルール専用。描画・音・DOMには依存しません。 */
+(function (root) {
+  'use strict';
+
+  const RULES = Object.freeze({ duration: 60000, rounds: 20, window: 1000, great: 500, maxHp: 200 });
+  // HPを0.5単位の整数で保持し、浮動小数点の誤差を避けます。
+  const DAMAGE = Object.freeze({ GREAT: 15, GOOD: 10, BAD: 5, MISS: 0 });
+  const DIRECTIONS = Object.freeze(['up', 'right', 'down', 'left']);
+  const KEYS = Object.freeze({
+    ArrowUp: ['human', 'up'], ArrowRight: ['human', 'right'],
+    ArrowDown: ['human', 'down'], ArrowLeft: ['human', 'left'],
+    KeyW: ['fish', 'up'], KeyD: ['fish', 'right'],
+    KeyS: ['fish', 'down'], KeyA: ['fish', 'left']
+  });
+
+  function createSchedule(random = Math.random) {
+    // 20個の受付窓と21個の可変休止。各休止650ms以上、最終窓も必ず60秒内。
+    const idleBudget = RULES.duration - RULES.rounds * RULES.window;
+    const minimumIdle = 650;
+    const weights = Array.from({ length: 21 }, () => 0.02 + Math.pow(random(), 3));
+    // 退化した乱数源でも等間隔に固定しないための最小の変動。
+    if (weights.every(value => value === weights[0])) weights[10] += 0.01;
+    const total = weights.reduce((sum, value) => sum + value, 0);
+    const surplus = idleBudget - minimumIdle * weights.length;
+    const gaps = weights.map(value => minimumIdle + surplus * value / total);
+    let cursor = gaps[0];
+    return Array.from({ length: RULES.rounds }, (_, index) => {
+      const round = { at: cursor, direction: DIRECTIONS[Math.min(3, Math.floor(random() * 4))] };
+      cursor += RULES.window + gaps[index + 1];
+      return round;
+    });
+  }
+
+  function judge(expected, actual, elapsed) {
+    if (elapsed < 0 || elapsed > RULES.window) return null;
+    if (expected !== actual) return 'BAD';
+    return elapsed <= RULES.great ? 'GREAT' : 'GOOD';
+  }
+
+  function resolveHp(hp, results) {
+    const next = { ...hp };
+    for (const player of ['fish', 'human']) {
+      const result = results[player] || 'MISS';
+      const target = result === 'BAD' ? player : player === 'fish' ? 'human' : 'fish';
+      next[target] -= DAMAGE[result];
+    }
+    next.fish = Math.max(0, Math.min(RULES.maxHp, next.fish));
+    next.human = Math.max(0, Math.min(RULES.maxHp, next.human));
+    return next;
+  }
+
+  function decide(hp, timeout = false) {
+    if (hp.fish === 0 && hp.human === 0) return 'DOUBLE K.O.';
+    if (hp.fish === 0) return 'HUMAN WIN';
+    if (hp.human === 0) return 'FISH WIN';
+    if (!timeout) return null;
+    if (hp.fish === hp.human) return 'DRAW';
+    return hp.fish > hp.human ? 'FISH WIN' : 'HUMAN WIN';
+  }
+
+  class Match {
+    constructor(random = Math.random, emit = () => {}) {
+      this.schedule = createSchedule(random);
+      this.emit = emit;
+      this.hp = { fish: RULES.maxHp, human: RULES.maxHp };
+      this.active = null;
+      this.index = 0;
+      this.time = 0;
+      this.result = null;
+      this.history = [];
+      this.stats = { fish: { GREAT: 0, GOOD: 0, BAD: 0, MISS: 0 }, human: { GREAT: 0, GOOD: 0, BAD: 0, MISS: 0 } };
+    }
+
+    advance(now) {
+      if (this.result) return;
+      this.time = Math.max(this.time, Math.min(now, RULES.duration));
+      // 1000msちょうどの入力を受け付けるため、締切を越えた時点で閉じます。
+      if (this.active && this.time > this.active.openedAt + RULES.window) this.resolve();
+      if (this.result) return;
+      if (!this.active && this.index < RULES.rounds && this.time >= this.schedule[this.index].at && this.time < RULES.duration) {
+        const planned = this.schedule[this.index++];
+        // 実際に方向を表示した時点が反応時間の起点です。
+        this.active = { number: this.index, direction: planned.direction, openedAt: this.time, inputs: {} };
+        this.emit({ type: 'prompt', round: this.active });
+      }
+      if (this.time >= RULES.duration) {
+        if (this.active) this.resolve();
+        if (!this.result) this.finish(decide(this.hp, true), 'TIME UP');
+      }
+    }
+
+    input(player, direction, now) {
+      if (this.result || !this.active || this.active.inputs[player]) return null;
+      if (!['fish', 'human'].includes(player) || !DIRECTIONS.includes(direction)) return null;
+      const elapsed = now - this.active.openedAt;
+      const result = judge(this.active.direction, direction, elapsed);
+      if (!result) return null;
+      this.active.inputs[player] = { result, elapsed };
+      this.emit({ type: 'judge', player, result, elapsed });
+      if (this.active.inputs.fish && this.active.inputs.human) this.resolve();
+      return result;
+    }
+
+    resolve() {
+      if (!this.active || this.result) return;
+      const round = this.active;
+      const results = { fish: round.inputs.fish?.result || 'MISS', human: round.inputs.human?.result || 'MISS' };
+      const previous = { ...this.hp };
+      this.hp = resolveHp(this.hp, results);
+      for (const player of ['fish', 'human']) this.stats[player][results[player]]++;
+      this.history.push({ number: round.number, openedAt: round.openedAt, results, hp: { ...this.hp } });
+      this.active = null;
+      this.emit({ type: 'resolve', results, previous, hp: { ...this.hp } });
+      const winner = decide(this.hp);
+      if (winner) this.finish(winner, 'K.O.');
+    }
+
+    finish(result, reason) {
+      this.result = result;
+      this.active = null;
+      this.emit({ type: 'finish', result, reason });
+    }
+  }
+
+  // 押下済みのキーはkeyupまで再利用不可。別の方向キーでも判定は各ラウンド1回のみ。
+  class KeyGate {
+    constructor() { this.held = new Set(); }
+    down(code, repeat) {
+      const held = this.held.has(code);
+      this.held.add(code);
+      return !repeat && !held ? KEYS[code] || null : null;
+    }
+    up(code) { this.held.delete(code); }
+    clear() { this.held.clear(); }
+  }
+
+  const api = { RULES, DAMAGE, DIRECTIONS, KEYS, createSchedule, judge, resolveHp, decide, Match, KeyGate };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.FishingRules = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* SVG演出専用。引く・耐えるを同じ力の応答として描きます。 */
+(function (root) {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const ease = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
+  const rotate = (x, y, cx, cy, degrees) => {
+    const rad = degrees * Math.PI / 180;
+    return { x: cx + (x - cx) * Math.cos(rad) - (y - cy) * Math.sin(rad), y: cy + (x - cx) * Math.sin(rad) + (y - cy) * Math.cos(rad) };
+  };
+
+  class LakeScene {
+    constructor(doc = document) {
+      this.doc = doc;
+      this.el = {};
+      for (const id of ['fish', 'fish-flex', 'fish-tail', 'boat', 'angler', 'stance', 'rod', 'rod-shine', 'fishing-line', 'line', 'line-shadow', 'line-flash', 'bait', 'spray', 'bubbles', 'surface', 'fish-wake', 'boat-wake']) this.el[id] = doc.getElementById(id);
+      this.signals = { fish: null, human: null };
+      for (const player of ['fish', 'human']) {
+        for (const part of ['signal', 'great-mark', 'bad-mark']) this.el[player + '-' + part] = doc.getElementById(player + '-' + part);
+      }
+      this.reduced = root.matchMedia('(prefers-reduced-motion: reduce)');
+      this.time = 0;
+      this.engaged = false;
+      this.attacks = { fish: null, human: null };
+      this.particles = [];
+      this.pool = [];
+      this.particleCount = 0;
+      this.lastWake = 0;
+      this.outcome = null;
+      this.outcomeAt = 0;
+      this.flash = 0;
+      this.pose = { fishX: 285, fishY: 582 };
+      this.bubbles = [];
+      for (let i = 0; i < 18; i++) {
+        const node = doc.createElementNS(NS, 'circle');
+        this.el.bubbles.appendChild(node);
+        this.bubbles.push({ node, x: 90 + Math.random() * 1280, y: 450 + Math.random() * 360, radius: 2 + Math.random() * 4, speed: 10 + Math.random() * 18 });
+      }
+    }
+
+    reset() {
+      this.clearSignals();
+      this.outcome = null;
+      this.engaged = false;
+      this.flash = 0;
+      this.attacks = { fish: null, human: null };
+      for (const particle of this.particles) {
+        particle.node.setAttribute('opacity', '0');
+        this.pool.push(particle.node);
+      }
+      this.particles = [];
+      this.el['fishing-line'].setAttribute('opacity', '1');
+      this.el.fish.setAttribute('opacity', '1');
+      this.el.bait.setAttribute('opacity', '0');
+    }
+
+    react(event) {
+      if (event.type === 'prompt') this.clearSignals();
+      else if (event.type === 'judge') {
+        const strength = event.result === 'GREAT' ? 1 : event.result === 'GOOD' ? .55 : -.32;
+        this.attacks[event.player] = { at: this.time, strength, result: event.result };
+        this.signals[event.player] = ['GREAT', 'BAD'].includes(event.result) ? { at: this.time, kind: event.result } : null;
+        this.flash = event.result === 'GREAT' ? .72 : event.result === 'GOOD' ? .3 : 0;
+        if (event.result !== 'BAD') {
+          if (event.player === 'fish') this.splash(this.pose.fishX + 85, this.pose.fishY, false, event.result === 'GREAT' ? 20 : 8, '#a4f0df');
+          else this.splash(1135, 421, true, event.result === 'GREAT' ? 20 : 8, '#fff0ca');
+        }
+      } else if (event.type === 'resolve') {
+        if (event.hp.fish < event.previous.fish) this.splash(this.pose.fishX - 35, this.pose.fishY - 10, false, 12);
+        if (event.hp.human < event.previous.human) this.splash(1265, 430, true, 12);
+      } else if (event.type === 'finish') {
+        this.clearSignals();
+        this.outcome = event.result;
+        this.outcomeAt = this.time;
+        this.splash(290, 418, true, 22);
+        if (event.result === 'DOUBLE K.O.') this.splash(1220, 418, true, 22);
+      }
+    }
+
+    clearSignals() {
+      for (const player of ['fish', 'human']) {
+        this.signals[player] = null;
+        this.el[player + '-signal'].setAttribute('opacity', '0');
+      }
+    }
+
+    greatAction(player) {
+      const attack = this.attacks[player];
+      const age = attack ? this.time - attack.at : 1;
+      if (this.reduced.matches || this.outcome || attack?.result !== 'GREAT' || age >= .72) return { age, power: 0, twist: 0, gather: 0 };
+      // GREATだけの「溜め→振り切り→反動」。GOODの応答式には触れない。
+      const power = Math.sin(Math.PI * age / .72) * Math.exp(-age * 1.7);
+      const twist = Math.sin(age * 36) * power;
+      const gather = Math.sin(Math.PI * Math.min(age / .13, 1)) * Math.max(0, 1 - age / .13);
+      return { age, power, twist, gather };
+    }
+
+    updateSignals(fishHead, humanHead) {
+      for (const player of ['fish', 'human']) {
+        const node = this.el[player + '-signal'];
+        const signal = this.signals[player];
+        const age = signal ? this.time - signal.at : 1;
+        if (!signal || age >= .66 || this.outcome) {
+          node.setAttribute('opacity', '0');
+          this.signals[player] = null;
+          continue;
+        }
+        const motion = !this.reduced.matches;
+        const great = signal.kind === 'GREAT';
+        const enter = motion ? Math.min(1, age / .045) : 1;
+        const fade = motion ? Math.min(1, (.66 - age) / .17) : 1;
+        const lift = motion ? Math.min(age / .5, 1) * (great ? 11 : 5) : 0;
+        const scale = motion && great ? 1 + .24 * Math.exp(-age * 12) * Math.sin(age * 30) : 1;
+        const turn = motion && !great ? Math.sin(age * 28) * 7 * Math.exp(-age * 3) : 0;
+        const head = player === 'fish' ? fishHead : humanHead;
+        const x = head.x - (player === 'human' ? 45 : 0);
+        // 右上HPと帽子の間に収める。魚側は水中の頭のすぐ上。
+        const y = player === 'human' ? Math.max(150, head.y - 30) : head.y - 42;
+        node.setAttribute('transform', `translate(${x} ${y - lift}) rotate(${turn}) scale(${scale})`);
+        node.setAttribute('opacity', String(enter * fade));
+        node.setAttribute('data-kind', signal.kind);
+        this.el[player + '-great-mark'].setAttribute('opacity', great ? '1' : '0');
+        this.el[player + '-bad-mark'].setAttribute('opacity', great ? '0' : '1');
+      }
+    }
+
+    impulse(player) {
+      const attack = this.attacks[player];
+      if (!attack) return 0;
+      const age = this.time - attack.at;
+      // 立ち上がり→力のピーク→小さい反動。タイムラインは判定とは独立。
+      const strike = 1.35 * Math.exp(-age * 5) * (1 - Math.exp(-age * 70));
+      const recoil = .18 * Math.exp(-Math.pow((age - .43) / .13, 2));
+      return attack.strength * (strike - recoil);
+    }
+
+    splash(x, y, surface, count = 12, color = '#d6f1df') {
+      if (this.reduced.matches) return;
+      for (let i = 0; i < count; i++) {
+        let node = this.pool.pop();
+        if (!node && this.particleCount < 80) {
+          node = this.doc.createElementNS(NS, 'circle');
+          this.el.spray.appendChild(node);
+          this.particleCount++;
+        }
+        if (!node) break;
+        node.setAttribute('fill', surface ? color : 'none');
+        node.setAttribute('stroke', color);
+        node.setAttribute('stroke-width', surface ? '.5' : '1.6');
+        node.setAttribute('opacity', '0');
+        this.particles.push({ node, x, y, vx: (Math.random() - .35) * (surface ? 240 : 150), vy: -55 - Math.random() * 190, age: 0, life: .45 + Math.random() * .45, surface, radius: 1.5 + Math.random() * 3.5 });
+      }
+    }
+
+    update(dt, frozen = false) {
+      const motion = !this.reduced.matches;
+      const step = frozen ? 0 : Math.min(dt, .05);
+      this.time += step;
+      const t = this.time;
+      this.flash = Math.max(0, this.flash - step * 3.3);
+      const effort = motion ? (this.engaged && !this.outcome ? 1 : .23) : 0;
+      const fishPull = motion ? this.impulse('fish') : 0;
+      const humanPull = motion ? this.impulse('human') : 0;
+      const cycle = Math.sin(t * 2.6);
+      let fishX = 285 - effort * (12 * cycle + 4 * Math.sin(t * 7.5)) - fishPull * 32 + humanPull * 26;
+      let fishY = 582 + effort * (17 * Math.sin(t * 3.2) + 5 * Math.cos(t * 8)) - fishPull * 9 - humanPull * 12;
+      let angle = clamp(24 + effort * 9 * Math.sin(t * 3.2) - fishPull * 10 + humanPull * 12, 16, 44);
+      let boatX = -effort * 4 * cycle - fishPull * 10 + humanPull * 5;
+      let boatY = effort * (3.5 * Math.sin(t * 1.7) + 3 * Math.abs(cycle));
+      let boatRoll = effort * 1.1 * cycle - fishPull * 1.1 + humanPull;
+      let lean = clamp(effort * (-3 - 8 * Math.sin(t * 2.6 + .4)) - fishPull * 12 + humanPull * 16, -25, 23);
+      let tipX = 948 + boatX - fishPull * 22 + humanPull * 12 + effort * 8 * cycle;
+      let tipY = 160 + boatY + fishPull * 14 - humanPull * 10 + effort * 6 * cycle;
+      const fishGreat = this.greatAction('fish');
+      const humanGreat = this.greatAction('human');
+      // 移動量だけでなく、胴体のねじれ・尾の連打・全身の溜めを追加する。
+      angle = clamp(angle + fishGreat.twist * 23, 12, 55);
+      fishX -= fishGreat.power * 9;
+      fishY += fishGreat.twist * 6;
+      lean = clamp(lean + humanGreat.power * 14 - humanGreat.gather * 9, -25, 32);
+      const bodyLift = humanGreat.gather * 9 - humanGreat.power * 20;
+      boatY += humanGreat.gather * 4 + humanGreat.power * 3;
+      boatRoll += humanGreat.twist * .9;
+      tipX += humanGreat.power * 14;
+      tipY += humanGreat.gather * 10 - humanGreat.power * 26;
+      const finishedFor = Math.max(0, t - this.outcomeAt);
+      const progress = motion ? ease(finishedFor / 1.8) : 1;
+      let lineOpacity = 1;
+      if (this.outcome === 'HUMAN WIN') {
+        fishX += 790 * progress;
+        fishY -= 265 * Math.sin(progress * Math.PI / 2) + 170 * Math.sin(progress * Math.PI);
+        angle -= progress * 110;
+        tipY -= 30 * progress;
+        lean -= 9 * progress;
+      } else if (this.outcome === 'FISH WIN') {
+        lineOpacity = Math.max(0, 1 - progress * 4);
+        fishX -= 560 * progress;
+        fishY += 20 * progress;
+        angle = 24 + (motion ? Math.sin(t * 10) * 8 : 0);
+        lean += 18 * progress;
+        this.el.bait.setAttribute('opacity', '1');
+      } else if (this.outcome === 'DOUBLE K.O.') {
+        fishY += 135 * progress;
+        angle += 100 * progress;
+        lean += 30 * progress;
+        tipY += 80 * progress;
+        lineOpacity = 1 - progress;
+      } else if (this.outcome === 'DRAW') {
+        fishX += 35 * progress;
+        lean += 10 * progress;
+        tipY += 30 * progress;
+      }
+      this.pose = { fishX, fishY, angle, boatX, boatY, boatRoll, lean, tipX, tipY };
+      const fishTransform = `translate(${fishX} ${fishY}) rotate(${angle})`;
+      this.el.fish.setAttribute('transform', fishTransform);
+      const flex = fishGreat.twist;
+      this.el['fish-flex'].setAttribute('transform', `translate(-115 3) scale(${1 + flex * .13} ${1 - flex * .17}) translate(115 -3)`);
+      this.el['fish-wake'].setAttribute('transform', fishTransform);
+      this.el['fish-wake'].setAttribute('opacity', this.outcome || !motion ? '0' : String(.15 + effort * .2 + Math.abs(fishPull) * .25));
+      this.el['fish-wake'].setAttribute('stroke-dashoffset', String(-t * 75));
+      this.el['boat-wake'].setAttribute('transform', `translate(${boatX} ${boatY})`);
+      this.el['boat-wake'].setAttribute('opacity', String(.2 + effort * .25 + Math.abs(fishPull - humanPull) * .2));
+      const tail = (motion ? Math.sin(t * (10 + Math.abs(fishPull) * 13)) * (4 + effort * 10 + Math.abs(fishPull) * 5) : 0) + fishGreat.power * Math.sin(fishGreat.age * 65) * 32;
+      this.el['fish-tail'].setAttribute('transform', `rotate(${tail} 80 0) scale(${1 - Math.abs(tail) * .006} 1)`);
+      this.el.boat.setAttribute('transform', `translate(${boatX} ${boatY}) rotate(${boatRoll} 1250 420)`);
+      this.el.angler.setAttribute('transform', (bodyLift ? `translate(0 ${bodyLift}) ` : '') + `rotate(${lean} 1242 340)`);
+      this.el.stance.setAttribute('transform', `rotate(${-lean * .12 - humanGreat.gather * 6} 1240 385)`);
+
+      // 魚の口→糸→竿先、および竿の根元→手を、描画と同じ変換で接続。
+      const mouth = rotate(-115, 3, 0, 0, angle);
+      const mouthX = fishX + mouth.x;
+      const mouthY = fishY + mouth.y;
+      const line = `M${tipX} ${tipY} L${mouthX} ${mouthY}`;
+      for (const id of ['line', 'line-shadow', 'line-flash']) this.el[id].setAttribute('d', line);
+      this.el['line-flash'].setAttribute('opacity', String(motion ? this.flash : 0));
+      this.el['fishing-line'].setAttribute('opacity', String(lineOpacity));
+      const hand = rotate(1161, 275, 1242, 340, lean);
+      const grip = rotate(hand.x, hand.y + bodyLift, 1250, 420, boatRoll);
+      const rod = `M${grip.x + boatX} ${grip.y + boatY} Q${1073 + boatX - humanGreat.power * 24} ${112 + fishPull * 38 + effort * 9 * cycle + boatY + humanGreat.power * 30} ${tipX} ${tipY}`;
+      this.el.rod.setAttribute('d', rod);
+      this.el['rod-shine'].setAttribute('d', rod);
+      this.el.bait.setAttribute('transform', `translate(${mouthX - 12} ${mouthY}) rotate(${angle})`);
+      const fishHead = rotate(-115 + 41 * (1 + flex * .13), 3 - 61 * (1 - flex * .17), 0, 0, angle);
+      const head = rotate(1244, 178, 1242, 340, lean);
+      const humanHead = rotate(head.x, head.y + bodyLift, 1250, 420, boatRoll);
+      this.updateSignals({ x: fishX + fishHead.x, y: fishY + fishHead.y }, { x: humanHead.x + boatX, y: humanHead.y + boatY });
+      if (motion) {
+        const height = Math.sin(t * 1.7) * 3;
+        this.el.surface.setAttribute('d', `M0 419 Q80 ${413 + height} 160 419 T480 419 T800 419 T1120 419 T1440 419`);
+      }
+      if (this.engaged && !this.outcome && t - this.lastWake > .18) {
+        this.lastWake = t;
+        this.splash(fishX + 95, fishY + 20, false, 2, '#93cfcf');
+      }
+      for (const bubble of this.bubbles) {
+        if (motion) bubble.y -= step * bubble.speed;
+        if (bubble.y < 447) bubble.y = 804;
+        bubble.node.setAttribute('cx', String(bubble.x + (motion ? Math.sin(t + bubble.x) * 6 : 0)));
+        bubble.node.setAttribute('cy', String(bubble.y));
+        bubble.node.setAttribute('r', String(bubble.radius));
+      }
+      const alive = [];
+      for (const particle of this.particles) {
+        particle.age += step;
+        if (particle.age >= particle.life || !motion) {
+          particle.node.setAttribute('opacity', '0');
+          this.pool.push(particle.node);
+          continue;
+        }
+        particle.x += particle.vx * step;
+        particle.y += particle.vy * step;
+        particle.vy += (particle.surface ? 430 : 70) * step;
+        const fade = 1 - particle.age / particle.life;
+        particle.node.setAttribute('cx', String(particle.x));
+        particle.node.setAttribute('cy', String(particle.y));
+        particle.node.setAttribute('r', String(particle.radius * (.5 + fade * .5)));
+        particle.node.setAttribute('opacity', String(fade * .8));
+        alive.push(particle);
+      }
+      this.particles = alive;
+    }
+  }
+  root.LakeScene = LakeScene;
+})(window);
+
+</script>
+<script>
+/* 自作PCM音源とWeb Audio再生管理。ゲームの時計・入力判定には依存しません。 */
+(function (root) {
+  'use strict';
+  const SAMPLE_RATE = 22050;
+  const TAU = Math.PI * 2;
+  const midi = note => 440 * Math.pow(2, (note - 69) / 12);
+
+  function noise(seed) {
+    return () => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return seed / 2147483648 - 1;
+    };
+  }
+
+  function addNote(data, start, duration, frequency, level, color = 'pluck', wrap = false) {
+    const offset = Math.round(start * SAMPLE_RATE);
+    const count = Math.round(duration * SAMPLE_RATE);
+    for (let index = 0; index < count; index++) {
+      const target = wrap ? (offset + index) % data.length : offset + index;
+      if (target >= data.length) break;
+      const t = index / SAMPLE_RATE;
+      const attack = Math.min(1, t / .004);
+      const release = Math.min(1, (duration - t) / .035);
+      const decay = Math.exp(-t * (color === 'bass' ? 4 : color === 'bell' ? 7 : 12));
+      const phase = TAU * frequency * t;
+      let sample = Math.sin(phase);
+      if (color === 'bell') sample = .73 * sample + .20 * Math.sin(phase * 2.002) + .07 * Math.sin(phase * 3.997);
+      if (color === 'pluck') sample = .80 * sample + .20 * Math.sin(phase * 2);
+      if (color === 'bass') sample = .88 * sample + .12 * Math.sin(phase * 2);
+      data[target] += sample * attack * release * decay * level;
+    }
+  }
+
+  function addPercussion(data, start, level, kind, random, wrap = false) {
+    const duration = kind === 'kick' ? .15 : .055;
+    const offset = Math.round(start * SAMPLE_RATE);
+    let filtered = 0;
+    for (let index = 0; index < duration * SAMPLE_RATE; index++) {
+      const target = wrap ? (offset + index) % data.length : offset + index;
+      if (target >= data.length) break;
+      const t = index / SAMPLE_RATE;
+      filtered = .66 * filtered + .34 * random();
+      const sample = kind === 'kick' ? Math.sin(TAU * (59 * t + 3 * (1 - Math.exp(-35 * t)))) : filtered;
+      const envelope = Math.min(1, t / .002) * Math.exp(-t * (kind === 'kick' ? 35 : 95));
+      data[target] += sample * envelope * level;
+    }
+  }
+
+  function capPeak(data, maximum) {
+    let peak = 0;
+    for (const sample of data) peak = Math.max(peak, Math.abs(sample));
+    if (peak > maximum) for (let i = 0; i < data.length; i++) data[i] *= maximum / peak;
+    return data;
+  }
+
+  function makeMusic() {
+    // 96 BPM / 8小節。旋律・ベース・木のような打音を疎に重ねます。
+    const beat = 60 / 96;
+    const data = new Float32Array(Math.round(32 * beat * SAMPLE_RATE));
+    const random = noise(17621);
+    const roots = [38, 38, 34, 34, 41, 41, 36, 36];
+    const phrase = [[0, 62], [.75, 69], [1.5, 65], [2.5, 67], [3.25, 69]];
+    for (let bar = 0; bar < 8; bar++) {
+      const start = bar * 4 * beat;
+      addNote(data, start, 1.1, midi(roots[bar]), .20, 'bass', true);
+      addNote(data, start + 2 * beat, .8, midi(roots[bar] + 12), .10, 'bass', true);
+      for (const [position, note] of phrase) {
+        const shifted = note + (bar >= 6 ? -2 : 0);
+        addNote(data, start + position * beat, .58, midi(shifted), .070, 'pluck', true);
+        addNote(data, start + position * beat + .19, .55, midi(shifted), .016, 'bell', true);
+      }
+      addPercussion(data, start, .14, 'kick', random, true);
+      addPercussion(data, start + 2.5 * beat, .08, 'kick', random, true);
+      for (let tick = 0; tick < 8; tick++) addPercussion(data, start + tick * .5 * beat, tick % 2 ? .045 : .026, 'brush', random, true);
+      addNote(data, start + 1.5 * beat, .08, 720, .026, 'pluck', true);
+      addNote(data, start + 3.5 * beat, .08, 650, .022, 'pluck', true);
+    }
+    // 残響は配列の先頭へ折り返しており、ループ境界で切断しません。
+    return capPeak(data, .24);
+  }
+
+  function makeEffect(kind) {
+    const durations = { GREAT: .58, GOOD: .32, BAD: .26, prompt: .10, count: .16, go: .50, win: .95, draw: .95, double: .85 };
+    const data = new Float32Array(Math.round((durations[kind] || .2) * SAMPLE_RATE));
+    const random = noise(171);
+    if (kind === 'GREAT') {
+      addPercussion(data, 0, .40, 'kick', random);
+      for (const [delay, note, level] of [[0, 74, .36], [.035, 81, .27], [.075, 86, .22]]) {
+        addNote(data, delay, .48, midi(note), level, 'bell');
+        addNote(data, delay + .09, .36, midi(note), level * .16, 'bell');
+      }
+    } else if (kind === 'GOOD') {
+      addNote(data, 0, .29, midi(74), .32, 'pluck');
+      addNote(data, .028, .26, midi(81), .12, 'bell');
+    } else if (kind === 'BAD') {
+      addNote(data, 0, .18, midi(50), .30, 'bass');
+      addNote(data, .075, .16, midi(45), .20, 'pluck');
+      addPercussion(data, 0, .06, 'brush', random);
+    } else if (kind === 'prompt' || kind === 'count') {
+      addNote(data, 0, data.length / SAMPLE_RATE, kind === 'prompt' ? 740 : 370, .17, 'pluck');
+      addPercussion(data, 0, .04, 'brush', random);
+    } else if (kind === 'double') {
+      addPercussion(data, 0, .32, 'kick', random);
+      addNote(data, .03, .72, midi(38), .29, 'bass');
+      addNote(data, .18, .60, midi(45), .15, 'bell');
+    } else {
+      const notes = kind === 'draw' ? [62, 67, 69] : [62, 65, 69, 74];
+      notes.forEach((note, index) => addNote(data, index * .075, kind === 'go' ? .25 : .62, midi(note), .27, 'bell'));
+    }
+    return capPeak(data, .62);
+  }
+
+  class AudioDirector {
+    constructor(host = root, onChange = () => {}) {
+      this.host = host;
+      this.onChange = onChange;
+      this.enabled = false;
+      this.context = null;
+      this.phase = 'title';
+      this.music = null;
+      this.musicBuffer = null;
+      this.musicOffset = 0;
+      this.voices = new Set();
+      this.buffers = new Map();
+      this.request = 0;
+    }
+
+    buffer(samples) {
+      const buffer = this.context.createBuffer(1, samples.length, SAMPLE_RATE);
+      buffer.getChannelData(0).set(samples);
+      return buffer;
+    }
+
+    initialize() {
+      if (this.context) return;
+      const Context = this.host.AudioContext || this.host.webkitAudioContext;
+      if (!Context) throw new Error('Audio unavailable');
+      this.context = new Context();
+      this.master = this.context.createGain();
+      this.master.gain.value = .62;
+      this.compressor = this.context.createDynamicsCompressor();
+      this.compressor.threshold.value = -12;
+      this.compressor.knee.value = 12;
+      this.compressor.ratio.value = 8;
+      this.compressor.attack.value = .003;
+      this.compressor.release.value = .16;
+      this.master.connect(this.compressor);
+      this.compressor.connect(this.context.destination);
+      this.musicBuffer = this.buffer(makeMusic());
+      for (const kind of ['GREAT', 'GOOD', 'BAD', 'prompt', 'count', 'go', 'win', 'draw', 'double']) this.buffers.set(kind, this.buffer(makeEffect(kind)));
+    }
+
+    async setEnabled(enabled) {
+      const request = ++this.request;
+      this.enabled = enabled;
+      if (!enabled) {
+        this.stopMusic();
+        this.stopVoices();
+        this.onChange();
+        return false;
+      }
+      try {
+        // この関数はSOUNDボタンのユーザー操作からのみ呼びます。
+        this.initialize();
+        if (this.context.state !== 'running') await this.context.resume();
+        if (request !== this.request || !this.enabled) return false;
+        if (this.context.state !== 'running') throw new Error('Audio is suspended');
+        if (this.phase === 'playing') this.startMusic();
+        this.onChange();
+        return true;
+      } catch (_) {
+        if (request === this.request) {
+          this.enabled = false;
+          this.stopMusic();
+          this.stopVoices();
+          this.onChange();
+        }
+        return false;
+      }
+    }
+
+    stopEntry(entry) {
+      if (!entry || !this.context) return;
+      const now = this.context.currentTime;
+      try {
+        entry.gain.gain.cancelScheduledValues(now);
+        entry.gain.gain.setValueAtTime(entry.gain.gain.value, now);
+        entry.gain.gain.linearRampToValueAtTime(0, now + .012);
+        entry.source.stop(now + .012);
+      } catch (_) { /* 終了済みノードは破棄だけでよい */ }
+    }
+
+    stopVoices() {
+      for (const entry of this.voices) this.stopEntry(entry);
+      this.voices.clear();
+    }
+
+    stopMusic(reset = false) {
+      if (this.music) {
+        this.musicOffset = (this.music.offset + this.context.currentTime - this.music.startedAt) % this.musicBuffer.duration;
+        this.stopEntry(this.music);
+        this.music = null;
+      }
+      if (reset) this.musicOffset = 0;
+    }
+
+    reset() {
+      this.stopMusic(true);
+      this.stopVoices();
+      this.phase = 'title';
+    }
+
+    setPhase(phase) {
+      this.phase = phase;
+      if (phase === 'playing') this.startMusic();
+      else {
+        this.stopMusic(phase === 'title' || phase === 'result');
+        this.stopVoices();
+      }
+    }
+
+    source(buffer, level, pan = 0) {
+      const source = this.context.createBufferSource();
+      const gain = this.context.createGain();
+      source.buffer = buffer;
+      gain.gain.value = level;
+      source.connect(gain);
+      const panner = this.context.createStereoPanner ? this.context.createStereoPanner() : null;
+      if (panner) {
+        panner.pan.value = pan;
+        gain.connect(panner);
+        panner.connect(this.master);
+      } else gain.connect(this.master);
+      const entry = { source, gain, panner };
+      source.onended = () => {
+        this.voices.delete(entry);
+        source.disconnect();
+        gain.disconnect();
+        panner?.disconnect();
+      };
+      return entry;
+    }
+
+    startMusic() {
+      if (!this.enabled || !this.context || this.context.state !== 'running' || this.music || this.phase !== 'playing') return;
+      const entry = this.source(this.musicBuffer, 0);
+      entry.source.loop = true;
+      entry.offset = this.musicOffset;
+      entry.startedAt = this.context.currentTime;
+      entry.gain.gain.setValueAtTime(0, entry.startedAt);
+      entry.gain.gain.linearRampToValueAtTime(.28, entry.startedAt + .18);
+      entry.source.start(0, entry.offset);
+      this.music = entry;
+    }
+
+    play(kind, player = null) {
+      if (!this.enabled || !this.context || this.context.state !== 'running') return;
+      if (!['playing', 'countdown', 'finishing'].includes(this.phase)) return;
+      const buffer = this.buffers.get(kind);
+      if (!buffer) return;
+      // 即時SEは最大4声。さらにマスター余裕とコンプレッサーを確保。
+      if (this.voices.size >= 4) {
+        const oldest = this.voices.values().next().value;
+        this.stopEntry(oldest);
+        this.voices.delete(oldest);
+      }
+      const level = kind === 'GREAT' ? .38 : kind === 'GOOD' ? .31 : kind === 'BAD' ? .24 : .28;
+      const entry = this.source(buffer, level, player === 'fish' ? -.55 : player === 'human' ? .55 : 0);
+      this.voices.add(entry);
+      entry.source.start();
+      if (kind === 'GREAT' && this.music) {
+        const now = this.context.currentTime;
+        const gain = this.music.gain.gain;
+        gain.cancelScheduledValues(now);
+        gain.setValueAtTime(.15, now);
+        gain.linearRampToValueAtTime(.28, now + .32);
+      }
+    }
+
+    silence() {
+      this.stopMusic();
+      this.stopVoices();
+    }
+  }
+
+  const api = { SAMPLE_RATE, makeMusic, makeEffect, AudioDirector };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.FishingAudio = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* 進行・入力・UI・音。ルールはengine.js、原画とアニメーションはscene.js。 */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const { Match, KeyGate, KEYS, RULES } = window.FishingRules;
+  const directionNames = { up: '上', right: '右', down: '下', left: '左' };
+  const directionAngles = { up: 0, right: 90, down: 180, left: 270 };
+  const scene = new window.LakeScene();
+  const gate = new KeyGate();
+  let state = 'title';
+  let match = null;
+  let gameTime = 0;
+  let lastFrame = performance.now();
+  let countdownAt = 0;
+  let countdownResume = false;
+  let finishAt = 0;
+  let feedbackUntil = 0;
+  const audio = new window.FishingAudio.AudioDirector(window, updateSound);
+  let previousCount = '';
+  let focusBeforeHelp = null;
+
+  function announce(text) { $('announcer').textContent = text; }
+  function setDirection(direction, idleName = '待機中') {
+    // SVGElementにはHTMLElement.hiddenの反映を前提にしない。
+    if (direction) {
+      $('direction').removeAttribute('hidden');
+      $('prompt-idle').setAttribute('hidden', '');
+    } else {
+      $('direction').setAttribute('hidden', '');
+      $('prompt-idle').removeAttribute('hidden');
+    }
+    $('direction').setAttribute('data-direction', direction || '');
+    if (direction) $('direction-arrow').setAttribute('transform', `rotate(${directionAngles[direction]} 50 50)`);
+    $('direction-name').textContent = direction ? directionNames[direction] : idleName;
+  }
+
+  function updateSound() {
+    const soundOn = audio.enabled;
+    $('sound').textContent = soundOn ? 'SOUND ON' : 'SOUND OFF';
+    $('sound').setAttribute('aria-pressed', String(soundOn));
+    $('sound').setAttribute('aria-label', soundOn ? '音をオフにする' : '音をオンにする');
+  }
+
+  function hpText(units) { return String(units / 2); }
+  function updateHp() {
+    for (const player of ['fish', 'human']) {
+      const hp = match ? match.hp[player] : RULES.maxHp;
+      $(player + '-hp').innerHTML = hpText(hp) + '<span>/ 100</span>';
+      const bar = $(player + '-bar');
+      bar.setAttribute('aria-valuenow', hpText(hp));
+      bar.querySelector('.health-fill').style.width = hp / 2 + '%';
+      bar.querySelector('.health-loss').style.width = hp / 2 + '%';
+    }
+  }
+
+  function resetCue() {
+    $('cue').className = 'cue dormant';
+    setDirection(null);
+    $('prompt-label').textContent = 'STAND BY';
+    $('cue').setAttribute('aria-label', '次の共通方向指示を待機中');
+    for (const player of ['fish', 'human']) {
+      $(player + '-judge').textContent = 'READY';
+      $(player + '-detail').textContent = player === 'fish' ? 'WASD' : '矢印キー';
+      $(player + '-judge').parentElement.className = 'judgment ' + player + '-judgment';
+    }
+  }
+
+  function showJudgment(player, result, elapsed) {
+    const element = $(player + '-judge');
+    element.parentElement.className = 'judgment ' + player + '-judgment has-result ' + result.toLowerCase();
+    element.textContent = result === 'MISS' ? 'NO INPUT' : result;
+    $(player + '-detail').textContent = result === 'MISS' ? '変化なし' : result === 'BAD' ? '自分 −2.5' : Math.round(elapsed) + ' ms / 相手 −' + (result === 'GREAT' ? '7.5' : '5');
+  }
+
+  function onEvent(event) {
+    scene.react(event);
+    if (event.type === 'prompt') {
+      resetCue();
+      $('cue').className = 'cue active';
+      setDirection(event.round.direction);
+      $('deadline-ring').style.strokeDashoffset = '0';
+      $('prompt-label').textContent = 'SAME DIRECTION';
+      $('cue').setAttribute('aria-label', '共通方向指示 ' + directionNames[event.round.direction]);
+      $('round-counter').textContent = String(event.round.number).padStart(2, '0') + ' / 20';
+      $('round-feedback').textContent = '';
+      $('phase').textContent = 'MAKE YOUR MOVE.';
+      audio.play('prompt');
+    } else if (event.type === 'judge') {
+      showJudgment(event.player, event.result, event.elapsed);
+      audio.play(event.result, event.player);
+    } else if (event.type === 'resolve') {
+      for (const player of ['fish', 'human']) if (event.results[player] === 'MISS') showJudgment(player, 'MISS', 0);
+      updateHp();
+      $('cue').className = 'cue dormant resolved';
+      $('prompt-label').textContent = 'ROUND RESOLVED';
+      $('deadline-ring').style.strokeDashoffset = '100';
+      const fishLoss = (event.previous.fish - event.hp.fish) / 2;
+      const humanLoss = (event.previous.human - event.hp.human) / 2;
+      $('round-feedback').textContent = fishLoss || humanLoss ? `FISH −${fishLoss}　/　HUMAN −${humanLoss}` : 'NO DAMAGE / 次の指示を待とう';
+      feedbackUntil = gameTime + 1000;
+      $('phase').textContent = 'THE TENSION HOLDS.';
+    } else if (event.type === 'finish') {
+      state = 'finishing';
+      finishAt = performance.now();
+      $('pause').disabled = true;
+      setDirection(null, '対戦終了');
+      $('prompt-label').textContent = 'DUEL COMPLETE';
+      $('phase').textContent = event.result;
+      announce(event.result + '。魚の体力' + hpText(match.hp.fish) + '、人間の体力' + hpText(match.hp.human));
+      audio.setPhase('finishing');
+      audio.play(event.result === 'DOUBLE K.O.' ? 'double' : event.result === 'DRAW' ? 'draw' : 'win');
+      scene.engaged = false;
+    }
+  }
+
+  function startCountdown(resume = false) {
+    countdownResume = resume;
+    countdownAt = performance.now();
+    previousCount = '';
+    state = 'countdown';
+    audio.setPhase('countdown');
+    $('arena').classList.add('playing');
+    for (const id of ['intro', 'paused', 'result', 'help']) $(id).hidden = true;
+    $('countdown').hidden = false;
+    $('count-number').textContent = '3';
+    $('pause').disabled = false;
+    $('pause').setAttribute('aria-label', '一時停止');
+    $('pause').textContent = 'Ⅱ';
+    document.activeElement?.blur();
+  }
+
+  function newGame() {
+    audio.reset();
+    match = new Match(Math.random, onEvent);
+    gameTime = 0;
+    scene.reset();
+    resetCue();
+    updateHp();
+    $('timer').innerHTML = '60<span>.0</span>';
+    $('timer').parentElement.classList.remove('urgent');
+    $('round-counter').textContent = '00 / 20';
+    $('round-feedback').textContent = '';
+    $('phase').textContent = 'THE LINE IS DRAWN.';
+    startCountdown(false);
+  }
+
+  function pause(message = 'ふたりの準備ができたら再開してください。') {
+    if (!['playing', 'countdown'].includes(state)) return;
+    state = 'paused';
+    scene.clearSignals();
+    audio.setPhase('paused');
+    $('countdown').hidden = true;
+    $('paused').hidden = false;
+    $('pause-message').textContent = message;
+    $('pause').textContent = '▶';
+    $('pause').setAttribute('aria-label', '対戦を再開');
+    $('resume').focus();
+    announce('一時停止。' + message);
+  }
+
+  function toTitle() {
+    state = 'title';
+    audio.setPhase('title');
+    match = null;
+    $('arena').classList.remove('playing');
+    for (const id of ['paused', 'result', 'help', 'countdown']) $(id).hidden = true;
+    $('intro').hidden = false;
+    $('pause').disabled = true;
+    $('pause').textContent = 'Ⅱ';
+    scene.reset();
+    resetCue();
+    updateHp();
+    $('timer').innerHTML = '60<span>.0</span>';
+    $('timer').parentElement.classList.remove('urgent');
+    $('round-counter').textContent = '00 / 20';
+    $('round-feedback').textContent = '';
+    $('phase').textContent = 'THE LINE IS DRAWN.';
+    $('start').focus();
+  }
+
+  function showResult() {
+    state = 'result';
+    audio.setPhase('result');
+    $('result-title').textContent = match.result;
+    $('result-reason').textContent = match.result === 'DOUBLE K.O.' ? 'BOTH FELL. NEITHER YIELDED.' : match.result === 'DRAW' ? 'SAME STRENGTH. SAME RESOLVE.' : match.time >= RULES.duration ? 'TIME UP / DUEL COMPLETE' : 'K.O. / DUEL COMPLETE';
+    $('result-copy').textContent = {
+      'HUMAN WIN': '最後まで、引ききった。釣り上げ成功。',
+      'FISH WIN': '糸を切り、餌もいただく。自由を取り戻した。',
+      'DOUBLE K.O.': '同じ一瞬に、最後の力を使いきった。',
+      'DRAW': '60秒の攻防。互いの意地は、譲らなかった。'
+    }[match.result];
+    $('result-fish').textContent = hpText(match.hp.fish);
+    $('result-human').textContent = hpText(match.hp.human);
+    $('stats').replaceChildren();
+    for (const label of ['GREAT', 'GOOD', 'BAD', 'MISS']) {
+      const left = document.createElement('span');
+      const middle = document.createElement('b');
+      const right = document.createElement('span');
+      left.textContent = String(match.stats.fish[label]);
+      middle.textContent = label === 'MISS' ? 'NO INPUT' : label;
+      right.textContent = String(match.stats.human[label]);
+      $('stats').append(left, middle, right);
+    }
+    $('result').hidden = false;
+    $('rematch').focus();
+  }
+
+  function openHelp() {
+    if (state === 'finishing') return;
+    focusBeforeHelp = document.activeElement;
+    if (state === 'playing' || state === 'countdown') pause();
+    $('help').hidden = false;
+    $('help-close').focus();
+  }
+  function closeHelp() {
+    $('help').hidden = true;
+    if (state === 'paused') $('resume').focus();
+    else focusBeforeHelp?.focus();
+  }
+
+  function frame(stamp) {
+    const delta = Math.max(0, stamp - lastFrame);
+    lastFrame = stamp;
+    if (state === 'playing') {
+      // 復帰時に矢印をまとめて消化しない。大きい描画停止は両者同時に停止。
+      if (delta > 200) pause('画面の更新が止まったため、一時停止しました。');
+      else {
+        gameTime = Math.min(RULES.duration, gameTime + delta);
+        match.advance(gameTime);
+        const remaining = Math.max(0, RULES.duration - gameTime);
+        const tenths = Math.ceil(remaining / 100);
+        $('timer').innerHTML = Math.floor(tenths / 10).toString().padStart(2, '0') + '<span>.' + tenths % 10 + '</span>';
+        $('timer').parentElement.classList.toggle('urgent', remaining <= 10000);
+        if (match.active) {
+          const fraction = Math.max(0, Math.min(1, (gameTime - match.active.openedAt) / RULES.window));
+          $('deadline-ring').style.strokeDashoffset = String(fraction * 100);
+        } else if (gameTime > feedbackUntil && !match.result) {
+          resetCue();
+          $('round-feedback').textContent = '';
+        }
+      }
+    } else if (state === 'countdown') {
+      if (delta > 200) countdownAt = stamp;
+      const elapsed = stamp - countdownAt;
+      const count = elapsed < 1000 ? '3' : elapsed < 2000 ? '2' : elapsed < 3000 ? '1' : 'GO';
+      $('count-number').textContent = count;
+      if (count !== previousCount) { audio.play(count === 'GO' ? 'go' : 'count'); previousCount = count; }
+      if (elapsed >= 3300) {
+        state = 'playing';
+        scene.engaged = true;
+        audio.setPhase('playing');
+        $('countdown').hidden = true;
+        announce(countdownResume ? '対戦を再開しました。' : '対戦開始。左の魚はWASD、右の人間は矢印キーです。');
+      }
+    } else if (state === 'finishing' && stamp - finishAt >= 2200) showResult();
+    scene.update(delta / 1000, state === 'paused' || (!$('help').hidden));
+    requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('keydown', event => {
+    if (KEYS[event.code]) event.preventDefault();
+    const key = gate.down(event.code, event.repeat);
+    if (event.code === 'Escape' && !event.repeat) {
+      if (!$('help').hidden) closeHelp();
+      else if (state === 'paused') startCountdown(true);
+      else pause();
+      return;
+    }
+    if (key && state === 'playing' && $('help').hidden) {
+      const sinceFrame = Math.max(0, performance.now() - lastFrame);
+      if (sinceFrame > 200) { pause('画面の更新が止まったため、一時停止しました。'); return; }
+      // 入力ハンドラが受け付けた時刻。描画フレームより細かい精度で判定。
+      const receivedAt = gameTime + sinceFrame;
+      if (receivedAt <= RULES.duration) match.input(key[0], key[1], receivedAt);
+    }
+  });
+  document.addEventListener('keyup', event => gate.up(event.code));
+  window.addEventListener('blur', () => { gate.clear(); pause('画面を離れたため、一時停止しました。'); audio.silence(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { gate.clear(); pause('画面を離れたため、一時停止しました。'); audio.silence(); }
+  });
+
+  $('start').addEventListener('click', newGame);
+  $('rematch').addEventListener('click', newGame);
+  $('resume').addEventListener('click', () => startCountdown(true));
+  $('pause').addEventListener('click', () => state === 'paused' ? startCountdown(true) : pause());
+  $('quit').addEventListener('click', toTitle);
+  $('back').addEventListener('click', toTitle);
+  document.querySelector('.brand').addEventListener('click', event => { event.preventDefault(); if (state === 'playing' || state === 'countdown') pause(); else if (state !== 'paused' && state !== 'finishing') toTitle(); });
+  $('sound').addEventListener('click', () => {
+    audio.setEnabled(!audio.enabled).then(updateSound);
+    updateSound();
+  });
+  for (const id of ['help-open', 'guide']) $(id).addEventListener('click', openHelp);
+  for (const id of ['help-close', 'help-done']) $(id).addEventListener('click', closeHelp);
+  $('help').addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const nodes = [$('help-close'), $('help-done')];
+    const first = nodes[0], last = nodes[1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
+  $('fullscreen').addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await $('arena').requestFullscreen();
+    } catch (_) { announce('この環境では全画面表示を利用できません。'); }
+  });
+  $('start').focus({ preventScroll: true });
+  requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>

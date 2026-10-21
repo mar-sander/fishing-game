@@ -1,0 +1,700 @@
+TAP version 13
+# Subtest: FA1 自作BGMは20秒・有限PCM・控えめなピーク・滑らかなループ境界
+ok 1 - FA1 自作BGMは20秒・有限PCM・控えめなピーク・滑らかなループ境界
+  ---
+  duration_ms: 130.340906
+  type: 'test'
+  ...
+# Subtest: FA1 全SEが有限・端でほぼ無音、GREATはGOODより強く長い
+ok 2 - FA1 全SEが有限・端でほぼ無音、GREATはGOODより強く長い
+  ---
+  duration_ms: 42.081268
+  type: 'test'
+  ...
+# Subtest: FA1 BGMと最大4声SEの保守的合算ピークが1未満
+ok 3 - FA1 BGMと最大4声SEの保守的合算ピークが1未満
+  ---
+  duration_ms: 0.200201
+  type: 'test'
+  ...
+# Subtest: FA1 初期ミュート:AudioContext・音源を作らず、操作で解放
+ok 4 - FA1 初期ミュート:AudioContext・音源を作らず、操作で解放
+  ---
+  duration_ms: 107.864333
+  type: 'test'
+  ...
+# Subtest: FA1 再生許可失敗時はミュートへ戻り、ゲーム側へ例外を出さない
+ok 5 - FA1 再生許可失敗時はミュートへ戻り、ゲーム側へ例外を出さない
+  ---
+  duration_ms: 88.989018
+  type: 'test'
+  ...
+# Subtest: FA1 音声許可待ちの途中でOFFにしても、遅い完了で再生しない
+ok 6 - FA1 音声許可待ちの途中でOFFにしても、遅い完了で再生しない
+  ---
+  duration_ms: 115.113612
+  type: 'test'
+  ...
+# Subtest: FA1 pause→resumeで位置継続、再戦で先頭、重複ループを残さない
+ok 7 - FA1 pause→resumeで位置継続、再戦で先頭、重複ループを残さない
+  ---
+  duration_ms: 122.640704
+  type: 'test'
+  ...
+# Subtest: FA1 同時GREATは左右別定位、声数上限、終了後ノード解放
+ok 8 - FA1 同時GREATは左右別定位、声数上限、終了後ノード解放
+  ---
+  duration_ms: 84.900368
+  type: 'test'
+  ...
+# Subtest: FA1 ミュート・タイトル・終了・非表示でBGM/SEを停止
+ok 9 - FA1 ミュート・タイトル・終了・非表示でBGM/SEを停止
+  ---
+  duration_ms: 87.550334
+  type: 'test'
+  ...
+# Subtest: FA1 アプリ操作で開始・停止・復帰・終了・再戦・タイトルのBGM寿命
+ok 10 - FA1 アプリ操作で開始・停止・復帰・終了・再戦・タイトルのBGM寿命
+  ---
+  duration_ms: 1790.530478
+  type: 'test'
+  ...
+# Subtest: 正方向 0ms = GREAT
+ok 11 - 正方向 0ms = GREAT
+  ---
+  duration_ms: 1.508128
+  type: 'test'
+  ...
+# Subtest: 正方向 499.999ms = GREAT
+ok 12 - 正方向 499.999ms = GREAT
+  ---
+  duration_ms: 0.168673
+  type: 'test'
+  ...
+# Subtest: 正方向 500ms = GREAT
+ok 13 - 正方向 500ms = GREAT
+  ---
+  duration_ms: 0.091798
+  type: 'test'
+  ...
+# Subtest: 正方向 500.0001ms = GOOD
+ok 14 - 正方向 500.0001ms = GOOD
+  ---
+  duration_ms: 0.088072
+  type: 'test'
+  ...
+# Subtest: 正方向 999.999ms = GOOD
+ok 15 - 正方向 999.999ms = GOOD
+  ---
+  duration_ms: 0.176866
+  type: 'test'
+  ...
+# Subtest: 正方向 1000ms = GOOD
+ok 16 - 正方向 1000ms = GOOD
+  ---
+  duration_ms: 0.088853
+  type: 'test'
+  ...
+# Subtest: 正方向 1000.0001ms = null
+ok 17 - 正方向 1000.0001ms = null
+  ---
+  duration_ms: 0.2327
+  type: 'test'
+  ...
+# Subtest: 正方向 -0.001ms = null
+ok 18 - 正方向 -0.001ms = null
+  ---
+  duration_ms: 0.106701
+  type: 'test'
+  ...
+# Subtest: 誤方向 0ms = BAD
+ok 19 - 誤方向 0ms = BAD
+  ---
+  duration_ms: 0.356256
+  type: 'test'
+  ...
+# Subtest: 誤方向 500ms = BAD
+ok 20 - 誤方向 500ms = BAD
+  ---
+  duration_ms: 0.42553
+  type: 'test'
+  ...
+# Subtest: 誤方向 750ms = BAD
+ok 21 - 誤方向 750ms = BAD
+  ---
+  duration_ms: 0.15964
+  type: 'test'
+  ...
+# Subtest: 誤方向 1000ms = BAD
+ok 22 - 誤方向 1000ms = BAD
+  ---
+  duration_ms: 0.903699
+  type: 'test'
+  ...
+# Subtest: 受付後の誤方向はBADにもならない
+ok 23 - 受付後の誤方向はBADにもならない
+  ---
+  duration_ms: 0.115503
+  type: 'test'
+  ...
+# Subtest: GREATは相手の体力7.5を減らす
+ok 24 - GREATは相手の体力7.5を減らす
+  ---
+  duration_ms: 0.822286
+  type: 'test'
+  ...
+# Subtest: GOODは相手の体力5を減らす
+ok 25 - GOODは相手の体力5を減らす
+  ---
+  duration_ms: 0.121082
+  type: 'test'
+  ...
+# Subtest: BADは自分だけ体力2.5を減らす
+ok 26 - BADは自分だけ体力2.5を減らす
+  ---
+  duration_ms: 0.090536
+  type: 'test'
+  ...
+# Subtest: 未入力は双方変化なし
+ok 27 - 未入力は双方変化なし
+  ---
+  duration_ms: 0.088634
+  type: 'test'
+  ...
+# Subtest: 魚GREAT・人間GOODを同時反映
+ok 28 - 魚GREAT・人間GOODを同時反映
+  ---
+  duration_ms: 0.10623
+  type: 'test'
+  ...
+# Subtest: 双方BADは双方の自傷だけ
+ok 29 - 双方BADは双方の自傷だけ
+  ---
+  duration_ms: 0.211068
+  type: 'test'
+  ...
+# Subtest: HPは負にならない
+ok 30 - HPは負にならない
+  ---
+  duration_ms: 0.120541
+  type: 'test'
+  ...
+# Subtest: GOOD20回で100を削りきる
+ok 31 - GOOD20回で100を削りきる
+  ---
+  duration_ms: 0.132059
+  type: 'test'
+  ...
+# Subtest: 0.5単位のHPに計算誤差なし
+ok 32 - 0.5単位のHPに計算誤差なし
+  ---
+  duration_ms: 0.210577
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":0,"human":5} timeout=false
+ok 33 - 勝敗 {"fish":0,"human":5} timeout=false
+  ---
+  duration_ms: 0.125438
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":5,"human":0} timeout=false
+ok 34 - 勝敗 {"fish":5,"human":0} timeout=false
+  ---
+  duration_ms: 0.071177
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":0,"human":0} timeout=false
+ok 35 - 勝敗 {"fish":0,"human":0} timeout=false
+  ---
+  duration_ms: 0.063235
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":5,"human":5} timeout=false
+ok 36 - 勝敗 {"fish":5,"human":5} timeout=false
+  ---
+  duration_ms: 0.06639
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":10,"human":5} timeout=true
+ok 37 - 勝敗 {"fish":10,"human":5} timeout=true
+  ---
+  duration_ms: 0.056515
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":5,"human":10} timeout=true
+ok 38 - 勝敗 {"fish":5,"human":10} timeout=true
+  ---
+  duration_ms: 0.063746
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":5,"human":5} timeout=true
+ok 39 - 勝敗 {"fish":5,"human":5} timeout=true
+  ---
+  duration_ms: 0.068263
+  type: 'test'
+  ...
+# Subtest: 勝敗 {"fish":0,"human":0} timeout=true
+ok 40 - 勝敗 {"fish":0,"human":0} timeout=true
+  ---
+  duration_ms: 0.119069
+  type: 'test'
+  ...
+# Subtest: 10000試合の予定:20回・非等間隔・重複なし・全受付が60秒内
+ok 41 - 10000試合の予定:20回・非等間隔・重複なし・全受付が60秒内
+  ---
+  duration_ms: 130.008094
+  type: 'test'
+  ...
+# Subtest: 退化した乱数でも等間隔を避ける
+ok 42 - 退化した乱数でも等間隔を避ける
+  ---
+  duration_ms: 0.276857
+  type: 'test'
+  ...
+# Subtest: フレーム周期1/16.67/50/199msで必ず20回完走する（計1200試合）
+ok 43 - フレーム周期1/16.67/50/199msで必ず20回完走する（計1200試合）
+  ---
+  duration_ms: 274.993276
+  type: 'test'
+  ...
+# Subtest: 各プレイヤーが独立して入力し双方が揃ってからHP更新
+ok 44 - 各プレイヤーが独立して入力し双方が揃ってからHP更新
+  ---
+  duration_ms: 0.41864
+  type: 'test'
+  ...
+# Subtest: 入力順序による結果差がない
+ok 45 - 入力順序による結果差がない
+  ---
+  duration_ms: 0.213411
+  type: 'test'
+  ...
+# Subtest: 片側未入力なら1秒まで相手を待つ
+ok 46 - 片側未入力なら1秒まで相手を待つ
+  ---
+  duration_ms: 0.118668
+  type: 'test'
+  ...
+# Subtest: 実際の表示が予定より遅れたら表示時刻から500msを計る
+ok 47 - 実際の表示が予定より遅れたら表示時刻から500msを計る
+  ---
+  duration_ms: 0.085509
+  type: 'test'
+  ...
+# Subtest: 各出現の最初の入力だけ採用・BADの後に修正不可
+ok 48 - 各出現の最初の入力だけ採用・BADの後に修正不可
+  ---
+  duration_ms: 0.098007
+  type: 'test'
+  ...
+# Subtest: 期限超過入力でダメージを与えられない
+ok 49 - 期限超過入力でダメージを与えられない
+  ---
+  duration_ms: 0.142234
+  type: 'test'
+  ...
+# Subtest: 同一ラウンドの双方0はDOUBLE K.O.、以後の出現停止
+ok 50 - 同一ラウンドの双方0はDOUBLE K.O.、以後の出現停止
+  ---
+  duration_ms: 0.263546
+  type: 'test'
+  ...
+# Subtest: 人間の早期勝利で以後の入力と出現を停止
+ok 51 - 人間の早期勝利で以後の入力と出現を停止
+  ---
+  duration_ms: 0.104527
+  type: 'test'
+  ...
+# Subtest: 魚の早期勝利
+ok 52 - 魚の早期勝利
+  ---
+  duration_ms: 0.084588
+  type: 'test'
+  ...
+# Subtest: 割当外の入力はラウンドの入力権を消費しない
+ok 53 - 割当外の入力はラウンドの入力権を消費しない
+  ---
+  duration_ms: 0.082024
+  type: 'test'
+  ...
+# Subtest: 押しっぱなし・repeat・別フレームの同一keydownを拒否、keyup後は有効
+ok 54 - 押しっぱなし・repeat・別フレームの同一keydownを拒否、keyup後は有効
+  ---
+  duration_ms: 0.130176
+  type: 'test'
+  ...
+# Subtest: WASD/矢印の同時押下は独立
+ok 55 - WASD/矢印の同時押下は独立
+  ---
+  duration_ms: 0.067471
+  type: 'test'
+  ...
+# Subtest: 割当外キーは無効
+ok 56 - 割当外キーは無効
+  ---
+  duration_ms: 0.081182
+  type: 'test'
+  ...
+# Subtest: フォーカス復帰でrepeatから新規入力は作らない
+ok 57 - フォーカス復帰でrepeatから新規入力は作らない
+  ---
+  duration_ms: 0.103556
+  type: 'test'
+  ...
+# Subtest: FA1 上: WASDは魚・矢印キーは人間、同時GREATと図形方向
+ok 58 - FA1 上: WASDは魚・矢印キーは人間、同時GREATと図形方向
+  ---
+  duration_ms: 124.387301
+  type: 'test'
+  ...
+# Subtest: FA1 右: WASDは魚・矢印キーは人間、同時GREATと図形方向
+ok 59 - FA1 右: WASDは魚・矢印キーは人間、同時GREATと図形方向
+  ---
+  duration_ms: 120.064699
+  type: 'test'
+  ...
+# Subtest: FA1 下: WASDは魚・矢印キーは人間、同時GREATと図形方向
+ok 60 - FA1 下: WASDは魚・矢印キーは人間、同時GREATと図形方向
+  ---
+  duration_ms: 45.062829
+  type: 'test'
+  ...
+# Subtest: FA1 左: WASDは魚・矢印キーは人間、同時GREATと図形方向
+ok 61 - FA1 左: WASDは魚・矢印キーは人間、同時GREATと図形方向
+  ---
+  duration_ms: 35.483921
+  type: 'test'
+  ...
+# Subtest: FA1 タイトル左右順・HP・ヘルプ・カウントダウン・読み上げ案内の一致
+ok 62 - FA1 タイトル左右順・HP・ヘルプ・カウントダウン・読み上げ案内の一致
+  ---
+  duration_ms: 18.706426
+  type: 'test'
+  ...
+# Subtest: FA1 図形矢印と1秒リングが同時に始まり、500msで半周
+ok 63 - FA1 図形矢印と1秒リングが同時に始まり、500msで半周
+  ---
+  duration_ms: 39.143225
+  type: 'test'
+  ...
+# Subtest: FA1 1000ms超の両入力は無効、未入力のダメージなし
+ok 64 - FA1 1000ms超の両入力は無効、未入力のダメージなし
+  ---
+  duration_ms: 31.289347
+  type: 'test'
+  ...
+# Subtest: FA1 両者BADはそれぞれ自傷2.5、同時GREATと独立した表示
+ok 65 - FA1 両者BADはそれぞれ自傷2.5、同時GREATと独立した表示
+  ---
+  duration_ms: 27.463433
+  type: 'test'
+  ...
+# Subtest: FA1 攻防6000フレーム:左右配置、口・糸・竿先・手の接続と粒子上限
+ok 66 - FA1 攻防6000フレーム:左右配置、口・糸・竿先・手の接続と粒子上限
+  ---
+  duration_ms: 508.566563
+  type: 'test'
+  ...
+# Subtest: FA1 GREATの反応はGOODより大きく、成功側に応じて逆向きに力が働く
+ok 67 - FA1 GREATの反応はGOODより大きく、成功側に応じて逆向きに力が働く
+  ---
+  duration_ms: 20.414765
+  type: 'test'
+  ...
+# Subtest: FA1 一時停止で攻防の姿勢が固定され、resetで判定反応を消去
+ok 68 - FA1 一時停止で攻防の姿勢が固定され、resetで判定反応を消去
+  ---
+  duration_ms: 4.901943
+  type: 'test'
+  ...
+# Subtest: FA1 reduced-motionは大きな姿勢変化・粒子・発光を停止
+ok 69 - FA1 reduced-motionは大きな姿勢変化・粒子・発光を停止
+  ---
+  duration_ms: 6.917324
+  type: 'test'
+  ...
+# Subtest: FA2 fish/GREAT: 記号の種類と所属
+ok 70 - FA2 fish/GREAT: 記号の種類と所属
+  ---
+  duration_ms: 14.700591
+  type: 'test'
+  ...
+# Subtest: FA2 fish/GOOD: 記号の種類と所属
+ok 71 - FA2 fish/GOOD: 記号の種類と所属
+  ---
+  duration_ms: 5.890299
+  type: 'test'
+  ...
+# Subtest: FA2 fish/BAD: 記号の種類と所属
+ok 72 - FA2 fish/BAD: 記号の種類と所属
+  ---
+  duration_ms: 5.224208
+  type: 'test'
+  ...
+# Subtest: FA2 fish/MISS: 記号の種類と所属
+ok 73 - FA2 fish/MISS: 記号の種類と所属
+  ---
+  duration_ms: 5.67823
+  type: 'test'
+  ...
+# Subtest: FA2 human/GREAT: 記号の種類と所属
+ok 74 - FA2 human/GREAT: 記号の種類と所属
+  ---
+  duration_ms: 7.680913
+  type: 'test'
+  ...
+# Subtest: FA2 human/GOOD: 記号の種類と所属
+ok 75 - FA2 human/GOOD: 記号の種類と所属
+  ---
+  duration_ms: 19.968875
+  type: 'test'
+  ...
+# Subtest: FA2 human/BAD: 記号の種類と所属
+ok 76 - FA2 human/BAD: 記号の種類と所属
+  ---
+  duration_ms: 12.57294
+  type: 'test'
+  ...
+# Subtest: FA2 human/MISS: 記号の種類と所属
+ok 77 - FA2 human/MISS: 記号の種類と所属
+  ---
+  duration_ms: 7.434512
+  type: 'test'
+  ...
+# Subtest: FA2 同時判定 GREAT/GREAT: 左右の記号を独立表示
+ok 78 - FA2 同時判定 GREAT/GREAT: 左右の記号を独立表示
+  ---
+  duration_ms: 8.027224
+  type: 'test'
+  ...
+# Subtest: FA2 同時判定 GREAT/BAD: 左右の記号を独立表示
+ok 79 - FA2 同時判定 GREAT/BAD: 左右の記号を独立表示
+  ---
+  duration_ms: 6.726878
+  type: 'test'
+  ...
+# Subtest: FA2 同時判定 BAD/GREAT: 左右の記号を独立表示
+ok 80 - FA2 同時判定 BAD/GREAT: 左右の記号を独立表示
+  ---
+  duration_ms: 6.841179
+  type: 'test'
+  ...
+# Subtest: FA2 同時判定 BAD/BAD: 左右の記号を独立表示
+ok 81 - FA2 同時判定 BAD/BAD: 左右の記号を独立表示
+  ---
+  duration_ms: 4.485096
+  type: 'test'
+  ...
+# Subtest: FA2 GOODの両者12姿勢がRC2記録と一致（竿・糸・尾も比較）
+ok 82 - FA2 GOODの両者12姿勢がRC2記録と一致（竿・糸・尾も比較）
+  ---
+  duration_ms: 21.292726
+  type: 'test'
+  ...
+# Subtest: FA2 GREAT専用: 魚は胴体変形と尾の連打、人間は沈み込み→全身引き上げ
+ok 83 - FA2 GREAT専用: 魚は胴体変形と尾の連打、人間は沈み込み→全身引き上げ
+  ---
+  duration_ms: 23.071813
+  type: 'test'
+  ...
+# Subtest: FA2 頭上記号は両者の移動に追従し、HUD・中央指示の領域へ入らない
+ok 84 - FA2 頭上記号は両者の移動に追従し、HUD・中央指示の領域へ入らない
+  ---
+  duration_ms: 12.750027
+  type: 'test'
+  ...
+# Subtest: FA2 記号は0.66秒以内で終了、新指示・決着・resetで即消去
+ok 85 - FA2 記号は0.66秒以内で終了、新指示・決着・resetで即消去
+  ---
+  duration_ms: 21.577745
+  type: 'test'
+  ...
+# Subtest: FA2 reduced-motionでも静止した正しい記号を短時間提示
+ok 86 - FA2 reduced-motionでも静止した正しい記号を短時間提示
+  ---
+  duration_ms: 4.346958
+  type: 'test'
+  ...
+# Subtest: FA2 実アプリ: pauseで記号を消し、再開・再戦・タイトルに残さない
+ok 87 - FA2 実アプリ: pauseで記号を消し、再開・再戦・タイトルに残さない
+  ---
+  duration_ms: 339.755435
+  type: 'test'
+  ...
+# Subtest: FA2 同時GREAT中も変形した魚の口と糸、全身移動後の手と竿が一致
+ok 88 - FA2 同時GREAT中も変形した魚の口と糸、全身移動後の手と竿が一致
+  ---
+  duration_ms: 14.152166
+  type: 'test'
+  ...
+# Subtest: 実ソース起動・タイトル・遊び方・フォーカス復帰
+ok 89 - 実ソース起動・タイトル・遊び方・フォーカス復帰
+  ---
+  duration_ms: 8.441557
+  type: 'test'
+  ...
+# Subtest: カウントダウン中の方向キーは判定されない
+ok 90 - カウントダウン中の方向キーは判定されない
+  ---
+  duration_ms: 15.67703
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:両者の独立入力・HP同時反映・反応時間
+ok 91 - 実DOMハンドラ:両者の独立入力・HP同時反映・反応時間
+  ---
+  duration_ms: 31.72679
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:BAD後の修正・repeat・連打を拒否
+ok 92 - 実DOMハンドラ:BAD後の修正・repeat・連打を拒否
+  ---
+  duration_ms: 37.067338
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:前ラウンドから保持したキーは次の指示で発火しない
+ok 93 - 実DOMハンドラ:前ラウンドから保持したキーは次の指示で発火しない
+  ---
+  duration_ms: 37.523668
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:割当外キーで入力機会を消費しない
+ok 94 - 実DOMハンドラ:割当外キーで入力機会を消費しない
+  ---
+  duration_ms: 28.20253
+  type: 'test'
+  ...
+# Subtest: Esc停止・再開中は体力もゲーム時間も固定
+ok 95 - Esc停止・再開中は体力もゲーム時間も固定
+  ---
+  duration_ms: 73.236929
+  type: 'test'
+  ...
+# Subtest: タブ非表示/blurで自動停止、再開まで入力無効
+ok 96 - タブ非表示/blurで自動停止、再開まで入力無効
+  ---
+  duration_ms: 79.088347
+  type: 'test'
+  ...
+# Subtest: 大きなフレーム停止では矢印を飛ばさず一時停止
+ok 97 - 大きなフレーム停止では矢印を飛ばさず一時停止
+  ---
+  duration_ms: 37.160522
+  type: 'test'
+  ...
+# Subtest: 入力時に描画停止を検知しても受付しない
+ok 98 - 入力時に描画停止を検知しても受付しない
+  ---
+  duration_ms: 39.277697
+  type: 'test'
+  ...
+# Subtest: プレイ中RULESを開くと停止し、閉じても勝手に再開しない
+ok 99 - プレイ中RULESを開くと停止し、閉じても勝手に再開しない
+  ---
+  duration_ms: 36.483145
+  type: 'test'
+  ...
+# Subtest: 60秒無入力:20回出現・DRAW・NO INPUT20・再戦でHPと結果を初期化
+ok 100 - 60秒無入力:20回出現・DRAW・NO INPUT20・再戦でHPと結果を初期化
+  ---
+  duration_ms: 297.550394
+  type: 'test'
+  ...
+# Subtest: 人間だけGREAT:早期HUMAN WIN・演出中入力無効・竿と糸が有限座標
+ok 101 - 人間だけGREAT:早期HUMAN WIN・演出中入力無効・竿と糸が有限座標
+  ---
+  duration_ms: 256.107941
+  type: 'test'
+  ...
+# Subtest: 魚だけGREAT:FISH WIN・糸が切れ・餌が魚側へ移る
+ok 102 - 魚だけGREAT:FISH WIN・糸が切れ・餌が魚側へ移る
+  ---
+  duration_ms: 255.528674
+  type: 'test'
+  ...
+# Subtest: 双方GREAT:同一ラウンド決着はDOUBLE K.O.、DRAWと異なる表示・演出
+ok 103 - 双方GREAT:同一ラウンド決着はDOUBLE K.O.、DRAWと異なる表示・演出
+  ---
+  duration_ms: 313.945194
+  type: 'test'
+  ...
+# Subtest: 時間切れで体力差のある勝利も反映
+ok 104 - 時間切れで体力差のある勝利も反映
+  ---
+  duration_ms: 250.008767
+  type: 'test'
+  ...
+# Subtest: reduced-motionでも全試合・勝利が機能し粒子を生成しない
+ok 105 - reduced-motionでも全試合・勝利が機能し粒子を生成しない
+  ---
+  duration_ms: 113.664767
+  type: 'test'
+  ...
+# Subtest: タイトルに戻れば試合終了、次回はランダム予定を再生成
+ok 106 - タイトルに戻れば試合終了、次回はランダム予定を再生成
+  ---
+  duration_ms: 54.563359
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:表示後500msの正方向 = GREAT
+ok 107 - 実DOMハンドラ:表示後500msの正方向 = GREAT
+  ---
+  duration_ms: 25.764362
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:表示後500.001msの正方向 = GOOD
+ok 108 - 実DOMハンドラ:表示後500.001msの正方向 = GOOD
+  ---
+  duration_ms: 23.545434
+  type: 'test'
+  ...
+# Subtest: 実DOMハンドラ:表示後1000msの正方向 = GOOD
+ok 109 - 実DOMハンドラ:表示後1000msの正方向 = GOOD
+  ---
+  duration_ms: 39.737239
+  type: 'test'
+  ...
+# Subtest: 音を利用できなくても安全にミュートへ戻る
+ok 110 - 音を利用できなくても安全にミュートへ戻る
+  ---
+  duration_ms: 25.325162
+  type: 'test'
+  ...
+# Subtest: 糸の終点は回転・移動後も魚の口と一致する
+ok 111 - 糸の終点は回転・移動後も魚の口と一致する
+  ---
+  duration_ms: 25.479673
+  type: 'test'
+  ...
+# Subtest: 単体プレビューに正本のCSS/JS/SVGが完全一致で入っている
+ok 112 - 単体プレビューに正本のCSS/JS/SVGが完全一致で入っている
+  ---
+  duration_ms: 2.455374
+  type: 'test'
+  ...
+# Subtest: 公開用ソースとプレビューのSHA-256が記録と一致
+ok 113 - 公開用ソースとプレビューのSHA-256が記録と一致
+  ---
+  duration_ms: 1.411864
+  type: 'test'
+  ...
+# Subtest: HTMLのidに重複がない
+ok 114 - HTMLのidに重複がない
+  ---
+  duration_ms: 0.430177
+  type: 'test'
+  ...
+# Subtest: 外部CDN・ネットワーク・画像ダウンロードへの実行依存なし
+ok 115 - 外部CDN・ネットワーク・画像ダウンロードへの実行依存なし
+  ---
+  duration_ms: 0.736357
+  type: 'test'
+  ...
+1..115
+# tests 115
+# suites 0
+# pass 115
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3228.194792

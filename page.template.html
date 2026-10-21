@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b2635">
+<meta name="description" content="ひとつの矢印、ふたりの反射神経。1台のキーボードで遊ぶ釣り対戦ゲーム。">
+<title>FISHING DUEL — FA2 / RC3</title>
+<meta name="release-candidate" content="FD-S1-FA2-RC3">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+  <header class="masthead"><a class="brand" href="#" aria-label="FISHING DUEL タイトルへ">FD<span> / </span>FISHING DUEL</a><span class="edition">LOCAL TWO-PLAYER · FA2 / RC3</span><div class="utilities"><button id="sound" aria-pressed="false" aria-label="音をオンにする">SOUND OFF</button><button id="pause" disabled aria-label="一時停止">Ⅱ</button><button id="fullscreen" aria-label="全画面表示">⛶</button></div></header>
+  <section id="arena" class="arena" aria-label="FISHING DUEL ゲーム画面">
+    <!-- SCENE -->
+    <div class="hud">
+      <section class="health fish-health" aria-label="魚の体力"><div class="health-label"><span><b>02</b> FISH</span><output id="fish-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="魚の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="fish-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>逃げ切れ。</span><span>W A S D</span></div></section>
+      <section class="clock" aria-label="残り時間"><span>TIME LEFT</span><output id="timer">60<span>.0</span></output><small id="round-counter">00 / 20</small></section>
+      <section class="health human-health" aria-label="人間の体力"><div class="health-label"><span><b>01</b> HUMAN</span><output id="human-hp">100<span>/ 100</span></output></div><div class="health-track" role="progressbar" aria-label="人間の体力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="human-bar"><div class="health-loss"></div><div class="health-fill"></div></div><div class="health-foot"><span>釣り上げろ。</span><span>↑ ← ↓ →</span></div></section>
+    </div>
+    <div id="cue" class="cue dormant" aria-label="共通方向指示">
+      <div class="judgment fish-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">02 / FISH</span><strong id="fish-judge">READY</strong><small id="fish-detail">WASD</small></div>
+      <div class="prompt"><svg class="prompt-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="55"/><circle id="deadline-ring" cx="60" cy="60" r="55" pathLength="100"/></svg><svg id="direction" viewBox="0 0 100 100" aria-hidden="true" hidden><path id="direction-arrow" d="M50 9 85 44H66V87H34V44H15Z"/></svg><svg id="prompt-idle" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9V31M9 20H31"/><circle cx="20" cy="20" r="17"/></svg><span id="direction-name" class="sr-only">待機中</span><span id="prompt-label">STAND BY</span></div>
+      <div class="judgment human-judgment"><svg class="verdict-burst" viewBox="0 0 180 90" aria-hidden="true"><path d="M16 20 4 12M28 9 22 0M90 9V0M152 9 158 0M164 20 176 12M16 70 4 78M28 81 22 90M90 81V90M152 81 158 90M164 70 176 78"/></svg><span class="judge-owner">01 / HUMAN</span><strong id="human-judge">READY</strong><small id="human-detail">矢印キー</small></div>
+    </div>
+    <div id="round-feedback" class="round-feedback" aria-live="off"></div>
+    <div class="arena-caption"><span>ONE LAKE. TWO WILLS.</span><span id="phase">THE LINE IS DRAWN.</span></div>
+    <div id="countdown" class="countdown" hidden><span>THE DUEL BEGINS</span><strong id="count-number">3</strong><small>左の魚はWASD ／ 右の人間は矢印キー</small></div>
+    <div id="intro" class="overlay intro">
+      <div class="intro-card"><span class="eyebrow">A GAME OF REFLEX & RESOLVE</span><h1>FISHING<br><em>DUEL.</em></h1><p class="tagline">ひとつの矢印。ふたつの意地。</p><p class="intro-copy">釣り上げたい人間と、逃げ切りたい魚。<br>同じ方向指示に、ふたり同時に応えよう。</p>
+        <div class="players"><div><span class="player-tag fish-color">02 / FISH</span><div class="key-pad"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div></div><span class="versus">VS</span><div><span class="player-tag human-color">01 / HUMAN</span><div class="key-pad"><kbd>↑</kbd><span><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></span></div></div></div>
+        <button id="start" class="primary">対戦をはじめる <span>↗</span></button><div class="start-foot"><span>60 SECONDS / 20 SIGNALS</span><button id="help-open">遊び方 ↗</button></div><p class="keyboard-note">PC・キーボード1台・プレイヤー2人</p>
+      </div>
+    </div>
+    <div id="paused" class="overlay pause-overlay" hidden><div class="pause-card"><span class="eyebrow">TAKE A BREATH</span><h2>PAUSED.</h2><p id="pause-message">ふたりの準備ができたら再開してください。</p><button id="resume" class="primary">対戦を再開 <span>↗</span></button><button id="quit" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="result" class="overlay result-overlay" hidden><div class="result-card"><span id="result-reason" class="eyebrow">TIME UP</span><h2 id="result-title">DRAW</h2><p id="result-copy"></p><div class="result-score"><div class="fish-color"><span>02 / FISH</span><strong id="result-fish">100</strong></div><span class="score-colon">:</span><div class="human-color"><span>01 / HUMAN</span><strong id="result-human">100</strong></div></div><div id="stats" class="stats"></div><button id="rematch" class="primary">もう一度、勝負する <span>↗</span></button><button id="back" class="text-button">タイトルへ戻る</button></div></div>
+    <div id="help" class="overlay help-overlay" hidden><div class="help-card" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="help-heading"><span class="eyebrow">FIELD GUIDE / 01</span><button id="help-close" aria-label="遊び方を閉じる">✕</button></div><h2 id="help-title">反射神経で、<br>この糸の運命を決める。</h2><p>中央に出た矢印と同じ方向を入力。<br>左の魚は <b>W A S D</b>、右の人間は <b>矢印キー</b>。受付は1秒です。</p><div class="rules-table"><div><strong class="great">GREAT</strong><span>0.5秒以内に正解</span><b>相手 −7.5</b></div><div><strong class="good">GOOD</strong><span>0.5秒超〜1秒以内に正解</span><b>相手 −5</b></div><div><strong class="bad">BAD</strong><span>誤った方向を入力</span><b>自分 −2.5</b></div><div><strong>未入力</strong><span>1秒以内に入力なし</span><b>変化なし</b></div></div><p class="help-note">各指示で入力はひとり1回。押しっぱなし・連打は無効です。<br>双方のダメージを同時に反映し、体力0で決着。60秒経ったら残り体力で勝負します。両者同時に0なら DOUBLE K.O.、時間切れで同値なら DRAW です。</p><button id="help-done" class="primary">準備できました <span>↗</span></button></div></div>
+  </section>
+  <footer class="footer"><span><i></i> LOCAL DUEL <span class="footer-divider">/</span> AI-ASSISTED GAME CREATION</span><span class="footer-controls">ESC 一時停止 <span class="footer-divider">·</span> ヘッドホン推奨</span><button id="guide">RULES ↗</button></footer>
+</main>
+<p id="mobile-note" class="mobile-note">このゲームはPCのキーボードで2人対戦します。画面の閲覧はこの端末でも可能です。</p>
+<div id="announcer" class="sr-only" aria-live="polite"></div>
+<script src="engine.js"></script>
+<script src="scene.js"></script>
+<script src="audio.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
