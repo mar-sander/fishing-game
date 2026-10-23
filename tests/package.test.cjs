@@ -20,9 +20,11 @@ test('HTMLのidに重複がない',()=>{
   const ids=[...read('index.html').matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);
   assert.equal(new Set(ids).size,ids.length);
 });
-test('外部CDN・ネットワーク・画像ダウンロードへの実行依存なし',()=>{
+test('MP3以外の外部CDN・画像ダウンロード依存なし',()=>{
   const preview=read('FISHING_DUEL_FA2_Preview.html');
   assert.equal(/(?:src|href)="https?:\/\//.test(preview),false);
   assert.equal(/\bfetch\s*\(|XMLHttpRequest|WebSocket|@import\b/.test(preview),false);
+  assert.ok(preview.includes('BGM-battle.mp3'));
+  assert.ok(read('audio.js').includes('new this.host.Audio()'));
   for(const name of ['engine.js','scene.js','audio.js','app.js','style.css'])assert.ok(fs.existsSync(path.join(root,name)));
 });

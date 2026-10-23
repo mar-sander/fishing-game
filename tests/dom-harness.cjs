@@ -72,7 +72,7 @@ function createHarness({ reduced=false, seed=2468, audio=false }={}) {
     addEventListener:(type,fn)=>{(windowEvents[type]||=[]).push(fn);}
   });
   context.window=context;
-  if(sound)context.AudioContext=sound.AudioContext;
+  if(sound){context.AudioContext=sound.AudioContext;context.Audio=sound.Audio;}
   for(const file of ['engine.js','scene.js','audio.js','app.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file});
   function frame(dt=16){now+=dt;sound?.tick();const next=callback;callback=null;next(now);}
   function advance(duration,step=16){const end=now+duration;while(now<end)frame(Math.min(step,end-now));}
