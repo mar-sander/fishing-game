@@ -254,6 +254,7 @@
       }
     } else if (state === 'finishing' && stamp - finishAt >= 2200) showResult();
     scene.update(delta / 1000, state === 'paused' || (!$('help').hidden));
+    audio.updateMix();
     requestAnimationFrame(frame);
   }
 

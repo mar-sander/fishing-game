@@ -1,3 +1,57 @@
+# RELEASE_HANDOFF — Stage BGM-2 / Battle Mix Rebalance
+
+**状態：Package Ready（No.M実機試聴待ち）／GITHUB_WRITE_MODE: NO_WRITE**
+
+## 基準と変更の概要
+- 適用基準：Stage BGM-1の添付 `FISHING_DUEL_BGM1_Package_Ready.zip`。そこからの**音声調整のみ**。
+- Repository：`mar-sander/fishing-game`、公開URL：`https://mar-sander.github.io/fishing-game/`。
+- BGM-1実装開始時のremote `main`：`c0660ae909018211e00a5ab451d49fbfbabc4902`。公開担当は必ず**公開時点の最新main**との突合を行うこと。
+- GitHub上の既存音源：`BGM-battle.mp3`、Git blob SHA-1 `a34c7e4b41bd19fe636011cf6438a3005604283b`、約2.05MB。BGM-1実装時に存在を確認。ZIPには含めず、同じ位置の音源を利用する。
+- 製品コードの変更：`audio.js`（BGM基準0.25、判定SE音源とゲイン、効果音時ダッキング・音量復帰）、`app.js`（描画フレームからmix更新1行）。`engine.js`／`scene.js`／`scene.svg`／`style.css`／`page.template.html`／ゲームルール・操作は変更なし。
+- `index.html` と単体版 `FISHING_DUEL_FA2_Preview.html`、`SOURCE_HASHES.json`は`tools/build.py`から生成。変更済みテストは`tests/audio.test.cjs`。`TEST_RESULTS.md`と`TEST_OUTPUT.txt`が最終テスト証拠。
+- **音量値は音質の実機受容を保証しません。** MP3実音・実ChromeのSE対BGMバランス、最大音量での歪みは未検証です。No.Mの試聴を必要とします。
+
+## 挙動
+- SOUND ONのときだけBGM・SE再生。
+- BGMは対戦（`playing`）中のみ再生。通常音量 0.25、判定SE／方向指示音が出た際に一時減衰し、判定が続けば減衰を延長する。
+- Escによるポーズ・再開のカウントダウン中は無音。ポーズ解除後はMP3の停止位置から続ける。
+- 再戦・タイトル復帰・結果表示後は、次の対戦を曲の先頭から再開できる。
+- SEはWeb Audio、左右の魚・人間の定位および最大4声管理を維持。ゲーム時間や入力には関係しない。
+
+## 公開時の安全手順
+1. ZIPの正本・別添プレビューをSHA-256で照合。`PACKAGE_MANIFEST.json`、`SOURCE_HASHES.json`を確認。
+2. 公開先最新`main`のソース・MP3が前提から変わっていないか検証し、製品ソースと更新済みテストを反映。
+3. Gate A: PR、変更ファイル、差分、CI。Gate B: No.Mの**対象版の受け入れと明示的merge承認**を確認し、mainへ通常merge。Gate C: mainと当該Pagesデプロイ成功を確認、可能ならURL新コード表示も独立確認。
+4. 無承認の公開・mainへの書込みは禁止。追加費用0円、PC不要運用。
+
+## 試遊と制限
+プレビュー単体HTMLはCSS/JS/SVGを含むが、BGMはネットワーク先のMP3を取得する。実ブラウザ音声出力・曲の主観的な音量・著作権/利用許諾は未確認。SEの音量を上げているため、**初回はPC音量を低めにして試聴**すること。
+
+---
+
+# RELEASE_HANDOFF — Stage BGM-1
+
+**Package Ready（No.M試遊・公開承認待ち） / GITHUB_WRITE_MODE: NO_WRITE**
+
+- どこプロv0.3を確認済み。PC不要、追加費用0円優先。main mergeはNo.Mの明示承認まで実施しません。
+- Repository：`mar-sander/fishing-game`
+- 公開URL：`https://mar-sander.github.io/fishing-game/`
+- 開始remote main完全HEAD：`c0660ae909018211e00a5ab451d49fbfbabc4902`（2026-10-23 取得）。
+- 元ソースの `index.html`、`style.css`、`audio.js`、`app.js`、`engine.js`、`scene.js`、`page.template.html`、`scene.svg` は開始時、添付RC3 ZIP内のGit blob SHA-1がremote mainと一致することを確認。
+- 音源 `BGM-battle.mp3` は remote main に**存在**（Git blob SHA-1：`a34c7e4b41bd19fe636011cf6438a3005604283b`、2,047,675 bytes）。本ZIPへ再同梱はしていません。main上の音源を再利用してください。MP3実際の配信と音量の実測は未確認です。
+- **公開反映に必要な変更**：`audio.js` とテストファイル（`tests/audio-harness.cjs`、`tests/dom-harness.cjs`、`tests/audio.test.cjs`、`tests/package.test.cjs`）、`index.html`（正本のHTML構造は不変更）、`FISHING_DUEL_FA2_Preview.html`（生成物）、`SOURCE_HASHES.json`、文書類。ビルド後の`index.html`はbaseと同一。
+- **不変更ファイル**：`app.js`、`engine.js`、`scene.js`、`scene.svg`、`style.css`、`page.template.html` と判定用SEロジック。
+- 操作：SOUND ON→対戦をはじめる→3秒カウントダウン終了からBGM開始、Escで保存・無音、再開ボタン→3秒カウントダウン終了後に保存位置から再開。結果/タイトル/再戦は頭出し。SOUND OFFでもポーズ位置保持。
+- 単体HTMLは全CSS/JS/SVG内包。**外部BGMの取得だけネット接続を要する**。file://閲覧の場合は公開済みの絶対URLにフォールバックする。
+- 検証：Node.js v22.16.0 / Linux、自動テスト117 PASS・0 FAIL・0 SKIP。実ChromiumのURLアクセスは当環境のポリシーによりブロックされ、実ブラウザのBGM再生・オーディオ出力確認は未実施。実ブラウザ・物理キーボードの受け入れはNo.M実機確認待ち。
+- GitHub branch/PR：**未作成**、main/Pages未更新。`GITHUB_WRITE_MODE: NO_WRITE`。No.Mが新しいプレビューを承認した後、別途「公開して」でGate A/B/Cへ進む。CI必須条件は公開担当が確認。
+- 同一性：`SOURCE_HASHES.json` と `PACKAGE_MANIFEST.json`、外部の SHA256レポートで照合。実際の公開担当は最新mainへの意図しない変更有無と音源の存在を再確認し、非承認の変更を混入させない。
+- 音源の著作権・利用許諾についてはNo.M側の最終確認を要する（こちらでは未検証）。
+
+---
+
+## RC3公開前の過去引継ぎ（参考。現行状態は上記優先）
+
 # RELEASE_HANDOFF — Stage 1 Final Adjustment 2
 
 **RELEASE READY（Package Ready） / GITHUB_WRITE_MODE: NO_WRITE**

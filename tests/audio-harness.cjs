@@ -1,8 +1,15 @@
-/* Web Audioの呼び出しとノード寿命を検査する模擬環境。音の実再生ではありません。 */
+/* Web Audio / HTMLMediaElementの再生位置・ノード寿命を検査する模擬環境。実音ではありません。 */
 'use strict';
 function audioHarness(clock = () => 0, { rejectResume = false, deferredResume = false } = {}) {
   const contexts = [];
   const pending = [];
+  const tracks = [];
+  let lastTick = clock();
+  class Media {
+    constructor() { this.src=''; this.preload=''; this.loop=false; this.volume=1; this.paused=true; this.currentTime=0; this.playCount=0; this.pauseCount=0; tracks.push(this); }
+    play() { this.playCount++; this.paused=false; return Promise.resolve(); }
+    pause() { this.pauseCount++; this.paused=true; }
+  }
   class Param {
     constructor(value = 1) { this.value = value; this.events = []; }
     setValueAtTime(value, time) { this.value = value; this.events.push(['set', value, time]); }
@@ -52,6 +59,6 @@ function audioHarness(clock = () => 0, { rejectResume = false, deferredResume = 
     }
     active() { this.tick(); return this.sources.filter(node => node.started && !node.ended); }
   }
-  return { AudioContext: Context, contexts, flushResume() { for (const resolve of pending.splice(0)) resolve(); }, tick() { for (const context of contexts) context.tick(); } };
+  return { Audio: Media, tracks, AudioContext: Context, contexts, flushResume() { for (const resolve of pending.splice(0)) resolve(); }, tick() { const t = clock(); const dt = (t-lastTick)/1000; lastTick=t; for(const track of tracks) if(!track.paused) track.currentTime+=dt; for (const context of contexts) context.tick(); } };
 }
 module.exports = { audioHarness };

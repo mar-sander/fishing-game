@@ -965,11 +965,16 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
 
 </script>
 <script>
-/* 自作PCM音源とWeb Audio再生管理。ゲームの時計・入力判定には依存しません。 */
+/* 戦闘MP3 BGMはHTMLAudioElement、判定SEは従来のWeb Audio。試合時計とは独立。 */
 (function (root) {
   'use strict';
   const SAMPLE_RATE = 22050;
   const TAU = Math.PI * 2;
+  // MP3は元のマスター出力とは別経路。BGMを下げ、判定音に音量の余地を渡す。
+  const MIX = Object.freeze({
+    bgm: .25, greatDuck: .085, otherDuck: .14, promptDuck: .17,
+    greatDuckSeconds: .60, otherDuckSeconds: .37, promptDuckSeconds: .16
+  });
   const midi = note => 440 * Math.pow(2, (note - 69) / 12);
 
   function noise(seed) {
@@ -1020,6 +1025,7 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
     return data;
   }
 
+  // RC3以前の互換エクスポート。現行BGMとして再生しません。
   function makeMusic() {
     // 96 BPM / 8小節。旋律・ベース・木のような打音を疎に重ねます。
     const beat = 60 / 96;
@@ -1047,22 +1053,29 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
   }
 
   function makeEffect(kind) {
-    const durations = { GREAT: .58, GOOD: .32, BAD: .26, prompt: .10, count: .16, go: .50, win: .95, draw: .95, double: .85 };
+    const durations = { GREAT: .76, GOOD: .38, BAD: .42, prompt: .10, count: .16, go: .50, win: .95, draw: .95, double: .85 };
     const data = new Float32Array(Math.round((durations[kind] || .2) * SAMPLE_RATE));
     const random = noise(171);
     if (kind === 'GREAT') {
-      addPercussion(data, 0, .40, 'kick', random);
-      for (const [delay, note, level] of [[0, 74, .36], [.035, 81, .27], [.075, 86, .22]]) {
-        addNote(data, delay, .48, midi(note), level, 'bell');
-        addNote(data, delay + .09, .36, midi(note), level * .16, 'bell');
+      // 低い衝撃→上昇ファンファーレ→高い余韻。GOODとは違う音形にする。
+      addPercussion(data, 0, .66, 'kick', random);
+      addNote(data, 0, .22, midi(45), .32, 'bass');
+      for (const [delay, note, level] of [[0, 74, .40], [.045, 81, .34], [.11, 86, .29], [.195, 93, .23], [.32, 98, .15]]) {
+        addNote(data, delay, delay < .2 ? .55 : .38, midi(note), level, 'bell');
+        addNote(data, delay + .08, .32, midi(note + 12), level * .12, 'bell');
       }
+      addPercussion(data, .12, .16, 'brush', random);
     } else if (kind === 'GOOD') {
-      addNote(data, 0, .29, midi(74), .32, 'pluck');
-      addNote(data, .028, .26, midi(81), .12, 'bell');
+      // 軽いアタック＋2音の肯定音。GREATの長い連続上昇音とは区別。
+      addPercussion(data, 0, .17, 'kick', random);
+      addNote(data, 0, .32, midi(74), .37, 'pluck');
+      addNote(data, .038, .30, midi(81), .17, 'bell');
     } else if (kind === 'BAD') {
-      addNote(data, 0, .18, midi(50), .30, 'bass');
-      addNote(data, .075, .16, midi(45), .20, 'pluck');
-      addPercussion(data, 0, .06, 'brush', random);
+      // 低い2音が落ちるコミカルな失敗音。攻撃成功音と明確に分離。
+      addPercussion(data, 0, .20, 'brush', random);
+      addNote(data, 0, .21, midi(51), .34, 'bass');
+      addNote(data, .085, .26, midi(44), .28, 'pluck');
+      addNote(data, .16, .23, midi(37), .18, 'bass');
     } else if (kind === 'prompt' || kind === 'count') {
       addNote(data, 0, data.length / SAMPLE_RATE, kind === 'prompt' ? 740 : 370, .17, 'pluck');
       addPercussion(data, 0, .04, 'brush', random);
@@ -1084,9 +1097,11 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
       this.enabled = false;
       this.context = null;
       this.phase = 'title';
-      this.music = null;
-      this.musicBuffer = null;
-      this.musicOffset = 0;
+      this.music = null; // HTMLAudioElement。MP3のみを流し、SEは従来のWeb Audioを維持。
+      this.musicTicket = 0;
+      this.duckUntil = 0;
+      this.duckVolume = MIX.bgm;
+      this.lastMixAt = 0;
       this.voices = new Set();
       this.buffers = new Map();
       this.request = 0;
@@ -1104,7 +1119,7 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
       if (!Context) throw new Error('Audio unavailable');
       this.context = new Context();
       this.master = this.context.createGain();
-      this.master.gain.value = .62;
+      this.master.gain.value = .80;
       this.compressor = this.context.createDynamicsCompressor();
       this.compressor.threshold.value = -12;
       this.compressor.knee.value = 12;
@@ -1113,7 +1128,15 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
       this.compressor.release.value = .16;
       this.master.connect(this.compressor);
       this.compressor.connect(this.context.destination);
-      this.musicBuffer = this.buffer(makeMusic());
+      // 本番は同階層のMP3を使用。単体HTMLをfile://で開いた時だけ公開済み音源へ接続。
+      const url = this.host.location?.protocol === 'file:'
+        ? 'https://mar-sander.github.io/fishing-game/BGM-battle.mp3'
+        : 'BGM-battle.mp3';
+      this.music = new this.host.Audio();
+      this.music.src = url;
+      this.music.preload = 'auto';
+      this.music.loop = true;
+      this.music.volume = MIX.bgm;
       for (const kind of ['GREAT', 'GOOD', 'BAD', 'prompt', 'count', 'go', 'win', 'draw', 'double']) this.buffers.set(kind, this.buffer(makeEffect(kind)));
     }
 
@@ -1163,12 +1186,15 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
     }
 
     stopMusic(reset = false) {
-      if (this.music) {
-        this.musicOffset = (this.music.offset + this.context.currentTime - this.music.startedAt) % this.musicBuffer.duration;
-        this.stopEntry(this.music);
-        this.music = null;
+      ++this.musicTicket; // 遅れて解決するplay()が停止を打ち消さないための世代番号。
+      this.duckUntil = 0;
+      this.duckVolume = MIX.bgm;
+      if (!this.music) return;
+      this.music.volume = MIX.bgm;
+      this.music.pause(); // currentTimeは保持。ポーズ解除時に続きから再生する。
+      if (reset) {
+        try { this.music.currentTime = 0; } catch (_) { /* メタデータ取得前 */ }
       }
-      if (reset) this.musicOffset = 0;
     }
 
     reset() {
@@ -1208,16 +1234,45 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
       return entry;
     }
 
+    // 同じ指示への両者の判定が重なっても、低いBGM音量を保持する。
+    duckMusic(kind) {
+      if (!this.music || this.music.paused || this.phase !== 'playing') return;
+      const isGreat = kind === 'GREAT';
+      const isJudge = isGreat || kind === 'GOOD' || kind === 'BAD';
+      if (!isJudge && kind !== 'prompt') return;
+      const now = this.context.currentTime;
+      if (now >= this.duckUntil) this.duckVolume = MIX.bgm;
+      const target = isGreat ? MIX.greatDuck : isJudge ? MIX.otherDuck : MIX.promptDuck;
+      const duration = isGreat ? MIX.greatDuckSeconds : isJudge ? MIX.otherDuckSeconds : MIX.promptDuckSeconds;
+      this.duckUntil = Math.max(this.duckUntil, now + duration);
+      this.duckVolume = Math.min(this.duckVolume, target);
+      this.music.volume = this.duckVolume; // SEと同時に即時減衰。
+      this.lastMixAt = now;
+    }
+
+    // ゲーム描画フレームから呼び、判定終了後は自然な速度でBGM音量を戻す。
+    updateMix() {
+      if (!this.music || !this.context || this.music.paused || this.phase !== 'playing') return;
+      const now = this.context.currentTime;
+      const dt = Math.max(0, now - this.lastMixAt);
+      this.lastMixAt = now;
+      if (now < this.duckUntil) return;
+      this.duckVolume = MIX.bgm;
+      this.music.volume = Math.min(MIX.bgm, this.music.volume + dt / .20 * (MIX.bgm - this.music.volume));
+    }
+
     startMusic() {
-      if (!this.enabled || !this.context || this.context.state !== 'running' || this.music || this.phase !== 'playing') return;
-      const entry = this.source(this.musicBuffer, 0);
-      entry.source.loop = true;
-      entry.offset = this.musicOffset;
-      entry.startedAt = this.context.currentTime;
-      entry.gain.gain.setValueAtTime(0, entry.startedAt);
-      entry.gain.gain.linearRampToValueAtTime(.28, entry.startedAt + .18);
-      entry.source.start(0, entry.offset);
-      this.music = entry;
+      if (!this.enabled || !this.context || this.context.state !== 'running' || !this.music || this.phase !== 'playing' || !this.music.paused) return;
+      this.music.volume = MIX.bgm;
+      this.lastMixAt = this.context.currentTime;
+      const ticket = ++this.musicTicket;
+      // SOUND ONはユーザー操作で解放。play()拒否時も既存SEを維持する。
+      try {
+        const playPromise = this.music.play();
+        if (playPromise?.then) playPromise.then(() => {
+          if (ticket === this.musicTicket && (!this.enabled || this.phase !== 'playing')) this.music.pause();
+        }).catch(() => { /* 音源未取得・再生制限時はゲームを止めない */ });
+      } catch (_) { /* ブラウザで音声を許可できない場合もゲーム進行は維持 */ }
     }
 
     play(kind, player = null) {
@@ -1231,17 +1286,11 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
         this.stopEntry(oldest);
         this.voices.delete(oldest);
       }
-      const level = kind === 'GREAT' ? .38 : kind === 'GOOD' ? .31 : kind === 'BAD' ? .24 : .28;
+      const level = kind === 'GREAT' ? .74 : kind === 'GOOD' ? .54 : kind === 'BAD' ? .58 : kind === 'win' || kind === 'double' ? .56 : .34;
       const entry = this.source(buffer, level, player === 'fish' ? -.55 : player === 'human' ? .55 : 0);
       this.voices.add(entry);
       entry.source.start();
-      if (kind === 'GREAT' && this.music) {
-        const now = this.context.currentTime;
-        const gain = this.music.gain.gain;
-        gain.cancelScheduledValues(now);
-        gain.setValueAtTime(.15, now);
-        gain.linearRampToValueAtTime(.28, now + .32);
-      }
+      this.duckMusic(kind);
     }
 
     silence() {
@@ -1250,7 +1299,7 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
     }
   }
 
-  const api = { SAMPLE_RATE, makeMusic, makeEffect, AudioDirector };
+  const api = { SAMPLE_RATE, MIX, makeMusic, makeEffect, AudioDirector };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FishingAudio = api;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -1513,6 +1562,7 @@ h2 { font-size: 5cqw; letter-spacing: -.05em; line-height: 1; margin: 1cqw 0; }
       }
     } else if (state === 'finishing' && stamp - finishAt >= 2200) showResult();
     scene.update(delta / 1000, state === 'paused' || (!$('help').hidden));
+    audio.updateMix();
     requestAnimationFrame(frame);
   }
 
