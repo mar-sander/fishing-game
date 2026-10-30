@@ -202,6 +202,7 @@
       $('stats').append(left, middle, right);
     }
     $('result').hidden = false;
+    audio.playResultFanfare(match.result);
     $('rematch').focus();
   }
 
