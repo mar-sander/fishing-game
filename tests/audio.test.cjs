@@ -23,14 +23,17 @@ test('初期SOUND OFFではAudioContextもMediaも作らない',async()=>{
   const {a,mock}=rig();a.setPhase('playing');a.play('GREAT','fish');
   assert.equal(mock.contexts.length,0);assert.equal(mock.tracks.length,0);assert.equal(a.enabled,false);
   assert.equal(await a.setEnabled(true),true);
-  assert.equal(mock.contexts.length,1);assert.equal(mock.tracks.length,1);
+  assert.equal(mock.contexts.length,1);assert.equal(mock.tracks.length,2);
   assert.equal(a.music.loop,true);assert.equal(a.music.volume,MIX.bgm);
   assert.equal(a.music.src,'BGM-battle.mp3');assert.equal(a.music.paused,false);
+  assert.equal(a.victoryMedia.src,'fanfare.mp3');assert.equal(a.victoryMedia.paused,true);
+  assert.equal(a.victoryMedia.loop,false);assert.equal(a.victoryMedia.volume,.56);
   assert.equal(mock.contexts[0].sources.filter(x=>x.loop).length,0,'旧PCM BGM音源は起動しない');
 });
 test('file://で単体プレビューを開いた場合のみ公開済みのMP3 URLを参照',async()=>{
   const {a,mock}=rig();mock.location={protocol:'file:'};await a.setEnabled(true);
   assert.equal(a.music.src,'https://mar-sander.github.io/fishing-game/BGM-battle.mp3');
+  assert.equal(a.victoryMedia.src,'https://mar-sander.github.io/fishing-game/fanfare.mp3');
   assert.equal(a.music.paused,true);
 });
 test('タイトル・カウントダウンは無音、ゲーム開始でのみMP3ループ',async()=>{
@@ -141,4 +144,124 @@ test('アプリ: 開始・停止・復帰・終了・再戦・タイトルまで
   h.click('rematch');h.advance(3320);assert.equal(track.paused,false);
   h.key('Escape');h.click('quit');h.advance(20);
   assert.equal(track.paused,true);assert.equal(track.currentTime,0);
+});
+
+test('結果ファンファーレは約8秒・全勝敗種が有限PCM・末尾は無音',()=>{
+  const {makeResultFanfare,FANFARE_SECONDS}=require('../audio.js');
+  assert.equal(FANFARE_SECONDS,8);
+  const outcomes=['HUMAN WIN','FISH WIN','DRAW','DOUBLE K.O.'];
+  const clips=outcomes.map(makeResultFanfare);
+  for(const clip of clips){
+    assert.equal(clip.length,SAMPLE_RATE*FANFARE_SECONDS);
+    assert.ok(clip.every(Number.isFinite));
+    assert.ok(peak(clip)<=.590001);
+    assert.ok(Math.abs(clip.at(-1))<1e-6);
+    assert.ok(rms(clip)>.03,'十分な音量がある');
+  }
+  assert.deepEqual(clips[0],clips[1],'魚と人間で公平に祝福');
+  assert.notDeepEqual(clips[0],clips[2]);
+  assert.notDeepEqual(clips[0],clips[3]);
+});
+
+test('WINのみfanfare.mp3、RESULT表示前に再生せず、Web Audio勝利ファンファーレとの二重再生なし', async()=>{
+  const {a,mock}=rig();
+  await a.setEnabled(true);
+  for(const phase of ['title','countdown','playing','finishing','paused']){
+    a.setPhase(phase);a.playResultFanfare('FISH WIN');
+    assert.equal(a.victoryMedia.playCount,0,phase);
+    assert.equal(mock.contexts[0].sources.length,0,phase);
+  }
+  a.setPhase('result');
+  a.playResultFanfare('HUMAN WIN');
+  assert.equal(a.victoryMedia.playCount,1);
+  assert.equal(a.victoryMedia.paused,false);
+  assert.equal(a.victoryMedia.currentTime,0);
+  assert.equal(mock.contexts[0].sources.length,0,'旧WIN合成PCMを再生しない');
+  assert.equal(a.music.paused,true,'戦闘BGMも停止');
+  assert.equal(a.victoryMedia.loop,false);
+  a.setPhase('title');
+  assert.equal(a.victoryMedia.paused,true);
+  assert.equal(a.victoryMedia.currentTime,0);
+});
+
+test('DRAW／DOUBLE K.O.は従来の8秒専用PCM、WIN MP3はSOUND OFF・タイトル・再戦で停止',async()=>{
+  const {a,mock,advance}=rig();
+  await a.setEnabled(true);a.setPhase('result');
+  a.playResultFanfare('DRAW');
+  const draw=mock.contexts[0].sources.at(-1).buffer;
+  assert.equal(draw.duration,8);assert.equal(a.victoryMedia.playCount,0);
+  a.setPhase('title');assert.equal(a.voices.size,0);
+  a.setPhase('result');a.playResultFanfare('DOUBLE K.O.');
+  assert.notEqual(mock.contexts[0].sources.at(-1).buffer,draw);
+  assert.equal(a.voices.size,1);assert.equal(a.victoryMedia.playCount,0);
+  await a.setEnabled(false);assert.equal(a.voices.size,0);
+  await a.setEnabled(true);a.playResultFanfare('FISH WIN');
+  assert.equal(a.victoryMedia.playCount,1);assert.equal(a.voices.size,0);
+  advance(3300);const played=a.victoryMedia.currentTime;assert.ok(played>3);
+  await a.setEnabled(false);assert.equal(a.victoryMedia.paused,true);assert.equal(a.victoryMedia.currentTime,0);
+  await a.setEnabled(true);a.playResultFanfare('HUMAN WIN');
+  assert.equal(a.victoryMedia.playCount,2);assert.equal(a.victoryMedia.currentTime,0);
+  a.reset();assert.equal(a.victoryMedia.paused,true);assert.equal(a.victoryMedia.currentTime,0);
+});
+
+test('アプリ: 結果画面でファンファーレ開始、勝敗種類に応じてMP3／PCMを区別', async()=>{
+  const h=createHarness({audio:true});
+  h.click('sound');await Promise.resolve();
+  h.click('start');h.advance(3320);
+  h.advance(60020);
+  const source=h.sound.contexts[0].sources;
+  assert.equal(h.$('result').hidden,true);
+  const preCount=source.length;
+  h.advance(2300);
+  assert.equal(h.$('result').hidden,false);
+  const win=['HUMAN WIN','FISH WIN'].includes(h.$('result-title').textContent);
+  if(win){
+    assert.equal(h.sound.tracks[1].playCount,1,'WINならfanfare.mp3を1回');
+    assert.equal(source.length,preCount,'旧WINのWeb Audioソースは増えない');
+  }else{
+    assert.equal(source.length,preCount+1,'DRAW／DOUBLE K.O.なら合成PCMを1回');
+    assert.equal(source.at(-1).buffer.duration,8);
+  }
+  assert.equal(h.sound.tracks[0].paused,true,'戦闘BGMは再生されない');
+  h.click('rematch');h.advance(32);
+  assert.equal(h.sound.tracks[1].paused,true,'再戦でMP3停止');
+  assert.equal(h.sound.contexts[0].active().filter(node=>node.buffer?.duration===8).length,0, '前回RESULTの8秒音源は停止');
+});
+
+test('RESULT-1 FA1: 壮大な勝利版は最後のクライマックスが強く、同音量範囲で約8秒',()=>{
+  const {makeResultFanfare,FANFARE_SECONDS}=require('../audio.js');
+  const victory=makeResultFanfare('HUMAN WIN');
+  const fish=makeResultFanfare('FISH WIN');
+  assert.equal(victory.length,FANFARE_SECONDS*SAMPLE_RATE);
+  assert.deepEqual(victory,fish);
+  assert.ok(victory.every(Number.isFinite));
+  assert.ok(peak(victory)<=.590001);
+  assert.ok(Math.abs(victory.at(-1))<1e-6);
+  const early=rms(victory.subarray(0,2*SAMPLE_RATE));
+  const climax=rms(victory.subarray(6*SAMPLE_RATE,7*SAMPLE_RATE));
+  assert.ok(climax>early*1.25, `Finale energy ${climax} vs opening ${early}`);
+  assert.ok(rms(victory)>.10,'勝利楽曲の演奏音量が確保されている');
+});
+
+
+test('結果画面からタイトルへ戻るとMP3停止し、試合BGMも停止',async()=>{
+  const h=createHarness({audio:true});
+  h.click('sound');await Promise.resolve();
+  h.click('start');h.advance(3320);h.advance(60020);h.advance(2300);
+  // テストハーネス上で、実際の勝敗に依存せず勝利MP3の制御を試す。
+  const audio=h.context.FishingAudio;
+  assert.ok(audio.AudioDirector);
+  const winTrack=h.sound.tracks[1];
+  h.click('back');
+  assert.equal(winTrack.paused,true);assert.equal(winTrack.currentTime,0);
+  assert.equal(h.sound.tracks[0].paused,true);
+});
+
+test('単体プレビューのパスではMP3を公開URLへ、通常のindex.htmlでは相対パスへ',async()=>{
+  const first=rig();first.mock.location={protocol:'https:',pathname:'/sandbox/FISHING_DUEL_Result1_MP3_Preview.html'};
+  await first.a.setEnabled(true);
+  assert.equal(first.a.victoryMedia.src,'https://mar-sander.github.io/fishing-game/fanfare.mp3');
+  const live=rig();live.mock.location={protocol:'https:',pathname:'/fishing-game/index.html'};
+  await live.a.setEnabled(true);
+  assert.equal(live.a.victoryMedia.src,'fanfare.mp3');
 });

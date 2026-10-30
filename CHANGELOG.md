@@ -1,3 +1,68 @@
+# Stage RESULT-1 FA3 — WIN Fanfare Volume 80% (No.M request)
+
+- Date: 2026-10-30. `GITHUB_WRITE_MODE: NO_WRITE`; **Package Ready / No.M review required**.
+- Base candidate: RESULT-1 FA2 (WIN MP3). Public `main` as checked before this change: `1caed61b9f9d2d3ffb14f7554dc6bd4f882cc7c3`. RESULT-1 stages are not yet released.
+- Requested adjustment only: `audio.js` victory media volume changes from `.70` to `.56` (`.70 × .80`). This is an HTMLAudioElement volume multiplier, not a measured 20% change in perceived loudness.
+- No other game/audio behavior changed: battle BGM `.25`, judgment SE, DRAW / DOUBLE K.O. PCM fanfares, gameplay rules, visuals and victory MP3 playback timing are preserved.
+- `fanfare.mp3` is already on the GitHub Pages repository root. Standalone preview loads it from `https://mar-sander.github.io/fishing-game/fanfare.mp3`; product `index.html` loads it by relative path. The MP3 file is not repackaged or edited.
+- Changed production file: `audio.js`. Updated verification: `tests/audio.test.cjs`; regenerated `FISHING_DUEL_FA2_Preview.html`, `SOURCE_HASHES.json`, `PACKAGE_MANIFEST.json`, testing evidence and this handoff.
+- **Not published.** No branch/push/PR/merge/Pages writes. No.M must approve the modified version and expressly authorize publishing. Before release, reconcile source and test changes against the latest `main` (BGM-2 only, not RESULT-1).
+- Actual speaker loudness, user-hosted MP3 data and real-device playback are not validated by these source tests.
+
+## Stage RESULT-1 FA3 minimal manual check
+
+1. SOUND ON, play to HUMAN WIN/FISH WIN: same fanfare plays at about 80% of FA2's media gain; battle BGM remains off during results.
+2. Replaying, turning SOUND OFF and returning to the title still stop the fanfare. DRAW and DOUBLE K.O. stay identical.
+
+---
+
+# Stage RESULT-1 FA2 — WIN MP3 Fanfare Replacement
+
+2026-10-30 / GITHUB_WRITE_MODE: NO_WRITE / Package Ready, No.M実機評価待ち
+
+- 採用元：Stage RESULT-1 Final Adjustment 1（Grand Fanfare）候補版。前Stageは未公開。
+- 最新remote main（読取確認）：`1caed61b9f9d2d3ffb14f7554dc6bd4f882cc7c3`。公開中のベースはStage BGM-2で、RESULT-1とGrand版は未公開のため、公開時はこの候補版の意図した差分をmainへ加える必要がある。
+- 勝利（HUMAN WIN / FISH WIN）のRESULT画面に入った瞬間のみ、既存GitHub Pagesルートに追加された `fanfare.mp3` を1回再生。ループなし。実際の長さはMP3本体に従い、8秒で強制停止しない。
+- DRAW / DOUBLE K.O.は前候補版の約8秒の自作PCMファンファーレを維持（生成方法／音量変更なし）。
+- 戦闘中の `BGM-battle.mp3`（音量 .25、判定時ダッキング、ポーズ再開位置保持）、GREAT/GOOD/BADのSE、60秒・20指示・HP・操作・画面は不変。
+- 結果画面に出る前の短い決着SEは従来どおり。勝利MP3は結果画面表示時に鳴るため重ならない。
+- SOUND OFF・タイトル復帰・再戦・ウィンドウ離脱では勝利MP3を停止し、次回用に0秒へ戻す。SOUND ON時のみ再生。
+- ユーザーアップロード済みGitHub MP3：`mar-sander/fishing-game` → `main/fanfare.mp3`（Git blob `e67a83ab87ba32d52f44a5b50f5cd071c948c754`、248319 bytes）。ソース内で相対参照。ZIP内にMP3を重複同梱しない。単体プレビューは公開済みURLから読込。
+- 音源の著作権・公開利用許諾と実MP3の音質・曲長はNo.Mが最終確認する。こちらの環境ではGitHub上の音声バイト本体のダウンロードができず、試聴実測は未実施。
+- 製品ソースの変更は`audio.js`のみ。`app.js`の結果画面呼び出しは前RESULT-1から変更なし。`engine.js`、`scene.js`、`scene.svg`、`style.css`、`index.html`、`page.template.html`、`tools/build.py`は前候補版からバイト一致。
+- 追加テストを含む回帰：Node.js v22.16.0／Linux、129 PASS・0 FAIL・0 SKIP。Chromium headlessで**代替MP3素材を用いた**HTMLAudioElementの開始・停止・非ループを確認、JS例外なし。実際のfanfare.mp3再生テストではない。
+- 公開候補版固定：`SOURCE_HASHES.json`（製品主要ファイル）＋`PACKAGE_MANIFEST.json`（ZIP内部32ファイル）＋別添SHA-256照合テキスト。ZIPと単体プレビューのバイト一致を確認。
+- **公開禁止**：No.Mが本候補版を実機で確認し、本Stageについて「公開して」等の明示承認を出すまでpush／PR／merge／Pages変更は実施しない。
+
+## 最小の実機確認
+
+1. サウンドOFF時にWINでも無音。ONにしてHUMAN WINまたはFISH WINのRESULT表示時に追加MP3が鳴る。
+2. 戦闘BGMと重ならず、終了後にループせず停止する。
+3. ファンファーレ再生中にSOUND OFF／再戦／タイトルへ戻ると停止する。
+4. DRAWとDOUBLE K.O.では従来の別ファンファーレが鳴る。
+
+---
+
+# Stage RESULT-1 — Final Adjustment 1 (2026-10-28)
+
+- No.Mの試聴フィードバック「勝利をもっと壮大かつ派手に」を反映。WINの8秒ファンファーレのみ刷新。
+- 金管の重奏、ストリングス風の和音、ティンパニ、スネア連打、シンバル、鐘のアルペジオ、終盤のクライマックスを、外部音源に依存せず自作PCMで合成。
+- 勝利時の再生ゲインのみ .66→.78。DRAW／DOUBLE K.O.のPCMは前版とビット単位で一致。戦闘BGMとSE、ゲームロジック、UIは変更しない。
+- `GITHUB_WRITE_MODE: NO_WRITE`。No.Mの今回版の受け入れ・公開承認は未取得。
+
+---
+
+# Stage RESULT-1 — Result Screen Fanfare (2026-10-28)
+
+- `audio.js`: 8.0-second synthesized original fanfare for HUMAN WIN / FISH WIN, separate restrained 8.0-second ending for DRAW and DOUBLE K.O. Existing Web Audio chain and SOUND control reused. No external fanfare assets or ongoing downloads.
+- `app.js`: trigger exactly once when result overlay becomes visible (after existing 2.2-second finish animation).
+- Lifecycle: silence during title/countdown/pause; battle MP3 stops on finish; result fanfare plays only with SOUND ON. New game, title, or SOUND OFF stops fanfare.
+- `tests/audio.test.cjs`: result timing, 8-second length, finite PCM, outcome-specific motifs, SOUND OFF/scene exit cleanup, app transition, no battle BGM overlap.
+- Generated `index.html`, single-file preview and source hashes from unchanged `tools/build.py`.
+- Base main: `44f08082d52db339598765aa0d8205f7d1f6d9d0` (confirmed 2026-10-28). `GITHUB_WRITE_MODE: NO_WRITE`. This is a new unpublished candidate; do not treat earlier public approval as merge permission.
+
+---
+
 # Stage BGM-2 — 2026-10-23 — MP3 / SE Balance Pass
 
 - 基準：BGM-1 Package Ready／remote `main` HEAD `c0660ae909018211e00a5ab451d49fbfbabc4902`（BGM-1取得時）。音声以外の変更なし。

@@ -1,3 +1,103 @@
+# Stage RESULT-1 FA3 — WIN Fanfare Volume 80% (No.M request)
+
+- Date: 2026-10-30. `GITHUB_WRITE_MODE: NO_WRITE`; **Package Ready / No.M review required**.
+- Base candidate: RESULT-1 FA2 (WIN MP3). Public `main` as checked before this change: `1caed61b9f9d2d3ffb14f7554dc6bd4f882cc7c3`. RESULT-1 stages are not yet released.
+- Requested adjustment only: `audio.js` victory media volume changes from `.70` to `.56` (`.70 × .80`). This is an HTMLAudioElement volume multiplier, not a measured 20% change in perceived loudness.
+- No other game/audio behavior changed: battle BGM `.25`, judgment SE, DRAW / DOUBLE K.O. PCM fanfares, gameplay rules, visuals and victory MP3 playback timing are preserved.
+- `fanfare.mp3` is already on the GitHub Pages repository root. Standalone preview loads it from `https://mar-sander.github.io/fishing-game/fanfare.mp3`; product `index.html` loads it by relative path. The MP3 file is not repackaged or edited.
+- Changed production file: `audio.js`. Updated verification: `tests/audio.test.cjs`; regenerated `FISHING_DUEL_FA2_Preview.html`, `SOURCE_HASHES.json`, `PACKAGE_MANIFEST.json`, testing evidence and this handoff.
+- **Not published.** No branch/push/PR/merge/Pages writes. No.M must approve the modified version and expressly authorize publishing. Before release, reconcile source and test changes against the latest `main` (BGM-2 only, not RESULT-1).
+- Actual speaker loudness, user-hosted MP3 data and real-device playback are not validated by these source tests.
+
+## Stage RESULT-1 FA3 minimal manual check
+
+1. SOUND ON, play to HUMAN WIN/FISH WIN: same fanfare plays at about 80% of FA2's media gain; battle BGM remains off during results.
+2. Replaying, turning SOUND OFF and returning to the title still stop the fanfare. DRAW and DOUBLE K.O. stay identical.
+
+---
+
+# Stage RESULT-1 FA2 — WIN MP3 Fanfare Replacement
+
+2026-10-30 / GITHUB_WRITE_MODE: NO_WRITE / Package Ready, No.M実機評価待ち
+
+- 採用元：Stage RESULT-1 Final Adjustment 1（Grand Fanfare）候補版。前Stageは未公開。
+- 最新remote main（読取確認）：`1caed61b9f9d2d3ffb14f7554dc6bd4f882cc7c3`。公開中のベースはStage BGM-2で、RESULT-1とGrand版は未公開のため、公開時はこの候補版の意図した差分をmainへ加える必要がある。
+- 勝利（HUMAN WIN / FISH WIN）のRESULT画面に入った瞬間のみ、既存GitHub Pagesルートに追加された `fanfare.mp3` を1回再生。ループなし。実際の長さはMP3本体に従い、8秒で強制停止しない。
+- DRAW / DOUBLE K.O.は前候補版の約8秒の自作PCMファンファーレを維持（生成方法／音量変更なし）。
+- 戦闘中の `BGM-battle.mp3`（音量 .25、判定時ダッキング、ポーズ再開位置保持）、GREAT/GOOD/BADのSE、60秒・20指示・HP・操作・画面は不変。
+- 結果画面に出る前の短い決着SEは従来どおり。勝利MP3は結果画面表示時に鳴るため重ならない。
+- SOUND OFF・タイトル復帰・再戦・ウィンドウ離脱では勝利MP3を停止し、次回用に0秒へ戻す。SOUND ON時のみ再生。
+- ユーザーアップロード済みGitHub MP3：`mar-sander/fishing-game` → `main/fanfare.mp3`（Git blob `e67a83ab87ba32d52f44a5b50f5cd071c948c754`、248319 bytes）。ソース内で相対参照。ZIP内にMP3を重複同梱しない。単体プレビューは公開済みURLから読込。
+- 音源の著作権・公開利用許諾と実MP3の音質・曲長はNo.Mが最終確認する。こちらの環境ではGitHub上の音声バイト本体のダウンロードができず、試聴実測は未実施。
+- 製品ソースの変更は`audio.js`のみ。`app.js`の結果画面呼び出しは前RESULT-1から変更なし。`engine.js`、`scene.js`、`scene.svg`、`style.css`、`index.html`、`page.template.html`、`tools/build.py`は前候補版からバイト一致。
+- 追加テストを含む回帰：Node.js v22.16.0／Linux、129 PASS・0 FAIL・0 SKIP。Chromium headlessで**代替MP3素材を用いた**HTMLAudioElementの開始・停止・非ループを確認、JS例外なし。実際のfanfare.mp3再生テストではない。
+- 公開候補版固定：`SOURCE_HASHES.json`（製品主要ファイル）＋`PACKAGE_MANIFEST.json`（ZIP内部32ファイル）＋別添SHA-256照合テキスト。ZIPと単体プレビューのバイト一致を確認。
+- **公開禁止**：No.Mが本候補版を実機で確認し、本Stageについて「公開して」等の明示承認を出すまでpush／PR／merge／Pages変更は実施しない。
+
+## 最小の実機確認
+
+1. サウンドOFF時にWINでも無音。ONにしてHUMAN WINまたはFISH WINのRESULT表示時に追加MP3が鳴る。
+2. 戦闘BGMと重ならず、終了後にループせず停止する。
+3. ファンファーレ再生中にSOUND OFF／再戦／タイトルへ戻ると停止する。
+4. DRAWとDOUBLE K.O.では従来の別ファンファーレが鳴る。
+
+---
+
+# RELEASE_HANDOFF — Stage RESULT-1 Final Adjustment 1
+
+**状態：Package Ready（実機試聴待ち）／GITHUB_WRITE_MODE: NO_WRITE**
+
+- 対象Repository: `mar-sander/fishing-game`; Pages: `https://mar-sander.github.io/fishing-game/`
+- 開始remote main: `44f08082d52db339598765aa0d8205f7d1f6d9d0` （2026-10-28に読み取り確認）
+- 変更はResult1版の**WIN楽曲に限定**。新しい金管重奏、弦風の持続和音、低音打撃、シンバル、スネアロール、鐘の音、および最後の大和音。
+- 本体コード変更: `audio.js`のみ。結果表示への再生トリガー `app.js`はRESULT-1から変更なし。新規外部素材・課金なし。
+- テスト変更: `tests/audio.test.cjs`に勝利時の8秒波形・最大振幅・クライマックス強度を検査する1件を追加。
+- ビルド生成物更新: `FISHING_DUEL_FA2_Preview.html`、`SOURCE_HASHES.json`、マニフェスト、テスト記録、CHANGELOG、README。index.htmlは前候補版と同一。
+- **不変**: DRAW／DOUBLE K.O.の音声波形、`engine.js`、`app.js`、`scene.js`、`scene.svg`、`style.css`、`page.template.html`、`tools/build.py`、戦闘BGMと従来SE。
+- 版の同一性は `PACKAGE_MANIFEST.json` と別添 SHA-256 テキスト、およびZIP内プレビューと別添プレビューのバイト単位一致を参照。
+- デモMP3は自作Web Audio波形から直接変換した試聴用。GitHubには同梱不要。
+- **未検証**：No.Mの実機での勝利音の主観的な印象、実スピーカー音量および音声歪み、実ブラウザでの聴感。
+- 著作権：他作品の曲やライセンス不明の音源は利用せず、コードによるオリジナル音符と合成音。
+- No.Mの確認と明示公開承認なしにbranch/PR/main/Pagesへの書き込みをしないこと。
+
+## 公開前の確認
+
+1. No.Mが新しい勝利ファンファーレの音色・音量・演奏時間を試聴し受け入れる。
+2. 公開担当が `main` の最新HEADと本パッケージのbaseを比較し、製品ファイル `audio.js` の意図した変更のみを反映する。
+3. どこプロv0.3に従い、更新済みテスト・PR差分・merge権限とデプロイ成功をそれぞれ確認する。
+
+---
+
+# RELEASE_HANDOFF — Stage RESULT-1 / Result Fanfare
+
+**Package Ready（試聴・実機受け入れ待ち）／GITHUB_WRITE_MODE: NO_WRITE**
+
+- 設計基準：正式「どこでもプロトコル」v0.3（2026-10-20）。PC不要・追加費用0円優先・公開前検証。No.Mの今回の公開承認は未取得。
+- Repository：`mar-sander/fishing-game`。公開URL：`https://mar-sander.github.io/fishing-game/`。
+- 開始remote `main`：`44f08082d52db339598765aa0d8205f7d1f6d9d0`（2026-10-28に読み取り確認）。
+- 正本：前回公開済み `FISHING_DUEL_BGM2_Package_Ready.zip` を基準とし、現行mainの `audio.js` / `app.js` がBGM-2内容であることを照合。
+- 今回の製品ソース変更：`audio.js` （結果別8秒ファンファーレのPCM生成と管理）、`app.js`（結果画面表示時の一度きりの呼び出し）。変更したテスト：`tests/audio.test.cjs`。`index.html`はBGM2と同一、プレビュー・ハッシュはbuild.pyによる生成物。
+- 不変更：`engine.js`, `scene.js`, `scene.svg`, `style.css`, `page.template.html`, `tools/build.py`, `BGM-battle.mp3`（remote mainに存在・本ZIPには同梱しない）。
+- 8秒ファンファーレは自作PCM音源で、ゲーム本体には別ファイルを追加しない。3種の試聴用MP3はレビュー専用で、GitHubへの公開必須ファイルではない。
+- 判定確定時の既存短い win/draw/double SEから2.2秒後、結果オーバーレイが見えた時にWeb Audioで約8秒のBGM以外のファンファーレを一度再生。SOUND OFFと画面遷移で停止。勝利2種には同一のメロディー、DRAW/DOUBLE K.O.はそれぞれ別の終幕音。
+- 判定タイミング・60秒・20指示・HP・音量0.25・音源のMP3ループ・SE・ポーズ保持に変更なし。
+- 結果画面のファンファーレはSOUND ON時のみ。公開前に実機で音質・最大音量、効果音とのバランス、勝敗種ごとの印象を確認する。
+
+## 検証
+
+- Node.js v22.16.0 / Linux：`node --test tests/*.test.cjs`、126 PASS / 0 FAIL / 0 SKIP。
+- 新規4件：8秒PCM・3パターン、状態ごとの再生制御、消音・再戦停止、結果画面への遷移連動。
+- Chromium 144 / Playwright headlessで単体HTMLをインメモリ表示し、SOUND ON→スタートを確認。JavaScript例外なし。ただしfile://直接アクセスは環境ポリシーでブロックされ、結果画面の実音出力・端末実機確認は未実施。
+- 最終ZIP内容とプレビューの一致は `PACKAGE_MANIFEST.json` および外部SHA-256ファイルで照合。
+
+## 公開ガード
+
+- `GITHUB_WRITE_MODE: NO_WRITE`：branch／PR／merge／Pagesは実施しない。
+- No.Mからこの版の確認と明示的な公開・マージ承認があるまでmainを変更しない。
+- 公開担当はremote main更新状況、Gate A/B/C、テスト・差分・対象ブランチの照合を実施し、承認済み版だけを公開すること。
+
+---
+
 # RELEASE_HANDOFF — Stage BGM-2 / Battle Mix Rebalance
 
 **状態：Package Ready（No.M実機試聴待ち）／GITHUB_WRITE_MODE: NO_WRITE**
